@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../../auth.php';
+wajib_admin('../../');
 require_once __DIR__ . '/../../koneksi.php';
 ?>
 <!DOCTYPE html>
@@ -15,8 +17,8 @@ require_once __DIR__ . '/../../koneksi.php';
         body { display: flex; background-color: #f4f6f9; color: #333; }
         .main-content { flex: 1; padding: 30px; }
         .header-title { font-size: 24px; font-weight: 700; margin-bottom: 20px; color: #111; }
-        .btn-tambah { display: inline-block; background-color: #007bff; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: 500; margin-bottom: 25px; transition: 0.3s; }
-        .btn-tambah:hover { background-color: #0056b3; }
+        .btn-tambah { display: inline-block; background-color: #EEB006; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: 500; margin-bottom: 25px; transition: 0.3s; }
+        .btn-tambah:hover { background-color: #D9A000; }
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         .gallery-card { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: relative; }
         .gallery-card img { width: 100%; height: 200px; object-fit: cover; display: block; }

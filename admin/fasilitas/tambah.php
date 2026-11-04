@@ -1,34 +1,41 @@
 <?php
+require_once __DIR__ . '/../../auth.php';
+wajib_admin('../../');
 require_once __DIR__ . '/../../koneksi.php';
 
 if (isset($_POST['submit'])) {
     $nama_fasilitas = mysqli_real_escape_string($conn, $_POST['nama_fasilitas']);
-    $jumlah = mysqli_real_escape_string($conn, $_POST['jumlah']);
+    $jumlah = filter_var($_POST['jumlah'] ?? '', FILTER_VALIDATE_INT);
 
-    // Proses upload gambar
-    $nama_file = $_FILES['gambar']['name'];
-    $ukuran_file = $_FILES['gambar']['size'];
-    $error = $_FILES['gambar']['error'];
-    $tmp_file = $_FILES['gambar']['tmp_name'];
-
-    if ($error === 4) {
-        echo "<script>alert('Pilih gambar terlebih dahulu!');</script>";
+    if ($jumlah === false || $jumlah < 0) {
+        echo "<script>alert('Jumlah harus berupa angka bulat minimal 0.');</script>";
     } else {
-        $ekstensi_valid = ['jpg', 'jpeg', 'png', 'webp'];
-        $ekstensi_gambar = explode('.', $nama_file);
-        $ekstensi_gambar = strtolower(end($ekstensi_gambar));
+        $jumlah = mysqli_real_escape_string($conn, (string) $jumlah);
 
-        if (!in_array($ekstensi_gambar, $ekstensi_valid)) {
-            echo "<script>alert('Format file tidak didukung! Gunakan JPG, JPEG, PNG, atau WEBP.');</script>";
+        // Proses upload gambar
+        $nama_file = $_FILES['gambar']['name'];
+        $error = $_FILES['gambar']['error'];
+        $tmp_file = $_FILES['gambar']['tmp_name'];
+
+        if ($error === 4) {
+            echo "<script>alert('Pilih gambar terlebih dahulu!');</script>";
         } else {
-            $nama_file_baru = uniqid() . '.' . $ekstensi_gambar;
-            move_uploaded_file($tmp_file, '../../assets/img/fasilitas/' . $nama_file_baru);
+            $ekstensi_valid = ['jpg', 'jpeg', 'png', 'webp'];
+            $ekstensi_gambar = explode('.', $nama_file);
+            $ekstensi_gambar = strtolower(end($ekstensi_gambar));
 
-            $query = "INSERT INTO fasilitas (nama_fasilitas, jumlah, gambar) VALUES ('$nama_fasilitas', '$jumlah', '$nama_file_baru')";
-            if (mysqli_query($conn, $query)) {
-                echo "<script>alert('Data fasilitas berhasil ditambahkan!'); window.location='index.php';</script>";
+            if (!in_array($ekstensi_gambar, $ekstensi_valid)) {
+                echo "<script>alert('Format file tidak didukung! Gunakan JPG, JPEG, PNG, atau WEBP.');</script>";
             } else {
-                echo "<script>alert('Gagal menambahkan data!');</script>";
+                $nama_file_baru = uniqid() . '.' . $ekstensi_gambar;
+                move_uploaded_file($tmp_file, '../../assets/img/fasilitas/' . $nama_file_baru);
+
+                $query = "INSERT INTO fasilitas (nama_fasilitas, jumlah, gambar) VALUES ('$nama_fasilitas', '$jumlah', '$nama_file_baru')";
+                if (mysqli_query($conn, $query)) {
+                    echo "<script>alert('Data fasilitas berhasil ditambahkan!'); window.location='index.php';</script>";
+                } else {
+                    echo "<script>alert('Gagal menambahkan data!');</script>";
+                }
             }
         }
     }
@@ -47,9 +54,10 @@ if (isset($_POST['submit'])) {
         h2 { margin-top: 0; color: #333; }
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: 500; color: #555; }
-        input[type="text"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        .btn-submit { background-color: #3206f8; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: 500; }
-        .btn-submit:hover { background-color: #3106ee; }
+        input[type="text"], input[type="number"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-family: 'Poppins', sans-serif; font-size: 15px; }
+        input[type="number"] { appearance: textfield; }
+        .btn-submit { background-color: #EEB006; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: 500; }
+        .btn-submit:hover { background-color: #D9A000; }
         .btn-back { background-color: #6d0bec; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; display: inline-block; margin-left: 10px; }
     </style>
 </head>
@@ -62,8 +70,8 @@ if (isset($_POST['submit'])) {
             <input type="text" name="nama_fasilitas" required>
         </div>
         <div class="form-group">
-            <label>Jumlah</label>
-            <input type="text" name="jumlah" placeholder="Contoh: 5 Unit">
+            <label for="jumlah">Jumlah (Unit)</label>
+            <input type="number" id="jumlah" name="jumlah" min="0" step="1" value="0" required>
         </div>
         <div class="form-group">
             <label>Gambar Fasilitas</label>

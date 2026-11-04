@@ -1,3 +1,13 @@
+<?php
+require_once __DIR__ . '/helpers.php';
+require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/koneksi.php';
+
+$fasilitas = mysqli_query($conn, "SELECT nama_fasilitas, jumlah FROM fasilitas ORDER BY id ASC");
+if (!$fasilitas) {
+    die('Gagal memuat data fasilitas: ' . mysqli_error($conn));
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -16,10 +26,11 @@
     <button class="menu-btn" aria-label="Buka menu">&#9776;</button>
     <nav id="menu">
         <a href="index.php">Home</a>
-        <a href="profile.html" class="active">Profile</a>
+        <a href="profile.php" class="active">Profile</a>
         <a href="berita.php">Berita</a>
         <a href="galeri.php">Galeri</a>
         <a href="fasilitas.php">Fasilitas</a>
+<?php include __DIR__ . '/partials/nav_auth.php'; ?>
         <!-- <a href="#kontak">Kontak</a> -->
     </nav>
 </header>
@@ -41,13 +52,16 @@
 
         <h3>Fasilitas Praktik</h3>
         <div class="fasilitas">
-            <div><strong>Gamelan Degung</strong><small>2 Set</small></div>
-            <div><strong>Gamelan Salendro</strong><small>2 Set</small></div>
-            <div><strong>Gamelan Pelog</strong><small>1 Set</small></div>
-            <div><strong>Kecapi</strong><small>± 32 Set</small></div>
-            <div><strong>Kendang</strong><small>± 12 Set</small></div>
-            <div><strong>Sound Sistem</strong><small>1 Set</small></div>
-            <div><strong>Lighting</strong><small>1 Set</small></div>
+            <?php while ($f = mysqli_fetch_assoc($fasilitas)) : ?>
+            <div>
+                <strong><?= e($f['nama_fasilitas']) ?></strong>
+                <small><?= e(format_jumlah_fasilitas($f['jumlah'])) ?></small>
+            </div>
+            <?php endwhile; ?>
+            <a class="fasilitas-selengkapnya" href="fasilitas.php">Selengkapnya ></a>
+            <?php if (mysqli_num_rows($fasilitas) === 0) : ?>
+            <p>Belum ada data fasilitas.</p>
+            <?php endif; ?>
         </div>
     </div>
 </section>
@@ -66,8 +80,8 @@
         </div>
         <!-- <div>
             <h4>Jurusan</h4>
-            <a href="profile.html">Seni Pertunjukan</a>
-            <a href="profile.html">Seni Karawitan</a>
+            <a href="profile.php">Seni Pertunjukan</a>
+            <a href="profile.php">Seni Karawitan</a>
         </div> -->
         <div>
             <h4>Hubungi Kami</h4>
@@ -78,7 +92,7 @@
         <div>
             <h4>Link Cepat</h4>
             <a href="index.php">Beranda</a>
-            <a href="profile.html">Profile</a>
+            <a href="profile.php">Profile</a>
             <a href="galeri.php">Galeri</a>
             <a href="berita.php">Berita</a>
             <a href="#kontak">Kontak</a>

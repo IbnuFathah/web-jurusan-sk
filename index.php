@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/koneksi.php';
 require_once __DIR__ . '/helpers.php';
+require_once __DIR__ . '/auth.php';
 
 // 3 berita terbaru & 4 foto galeri terbaru untuk ditampilkan di beranda
 $berita = mysqli_query($conn, "SELECT * FROM berita ORDER BY tanggal_publikasi DESC, id DESC LIMIT 3");
@@ -24,17 +25,18 @@ $galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 4");
     <button class="menu-btn" aria-label="Buka menu">&#9776;</button>
     <nav id="menu">
         <a href="index.php" class="active">Home</a>
-        <a href="profile.html">Profile</a>
+        <a href="profile.php">Profile</a>
         <a href="berita.php">Berita</a>
         <a href="galeri.php">Galeri</a>
          <a href="fasilitas.php">Fasilitas</a>
+<?php include __DIR__ . '/partials/nav_auth.php'; ?>
         <!-- <a href="#kontak">Kontak</a> -->
     </nav>
 </header>
 <section class="hero">
     <h1>Selamat Datang di Jurusan Kami</h1>
     <p>Mewadahi kreativitas, melestarikan budaya, dan menciptakan seniman muda berbakat di bidang Seni Pertunjukan dan Seni Karawitan.</p>
-    <a href="profile.html" class="btn">Kenali Kami Lebih Dekat</a>
+    <a href="profile.php" class="btn">Kenali Kami Lebih Dekat</a>
 </section>
 <!-- SECTION PROFIL SINGKAT -->
 <section class="home-section bg-light">
@@ -48,7 +50,7 @@ $galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 4");
             <div class="profile-text">
                 <h3>Sejarah Singkat</h3>
                 <p>Jurusan Seni Pertunjukan (SP) dan Seni Karawitan (SK) di SMKN 1 Kawali berdiri pada tahun 2016 didirikan oleh Pak Tisno. Awalnya 1 kelas berisi 18 siswa, kini berkembang menjadi 6 kelas dengan jumlah 25-30 siswa per kelas.</p>
-                <a href="profile.html" class="btn-outline">Lihat Profile Lengkap</a>
+                <a href="profile.php" class="btn-outline">Lihat Profile Lengkap</a>
             </div>
         </div>
     </div>
@@ -106,8 +108,8 @@ $galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 4");
         </div>
         <!-- <div>
             <h4>Jurusan</h4>
-            <a href="profile.html">Seni Pertunjukan</a>
-            <a href="profile.html">Seni Karawitan</a>
+            <a href="profile.php">Seni Pertunjukan</a>
+            <a href="profile.php">Seni Karawitan</a>
         </div> -->
         <div>
             <h4>Hubungi Kami</h4>
@@ -118,7 +120,7 @@ $galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 4");
         <div>
             <h4>Link Cepat</h4>
             <a href="index.php">Beranda</a>
-            <a href="profile.html">Profile</a>
+            <a href="profile.php">Profile</a>
             <a href="galeri.php">Galeri</a>
             <a href="berita.php">Berita</a>
             <a href="#kontak">Kontak</a>

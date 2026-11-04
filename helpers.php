@@ -6,6 +6,15 @@ function e($teks) {
     return htmlspecialchars((string) $teks, ENT_QUOTES, 'UTF-8');
 }
 
+function format_jumlah_fasilitas($jumlah) {
+    $jumlah = trim((string) $jumlah);
+    if ($jumlah === '') {
+        return '0';
+    }
+
+    return ctype_digit($jumlah) ? $jumlah . ' Unit' : $jumlah;
+}
+
 // 2026-08-01  ->  1 Agustus 2026
 function tanggal_indo($tanggal) {
     if (!$tanggal) return '';

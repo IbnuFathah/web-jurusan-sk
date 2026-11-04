@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../../auth.php';
+wajib_admin('../../');
 require_once __DIR__ . '/../../koneksi.php';
 
 if (isset($_POST['submit'])) {$judul_gambar = mysqli_real_escape_string($conn,$_POST['judul_gambar']);

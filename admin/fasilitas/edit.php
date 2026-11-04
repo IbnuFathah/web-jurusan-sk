@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../../auth.php';
+wajib_admin('../../');
 require_once __DIR__ . '/../../koneksi.php';
 
 $id = (int) ($_GET['id'] ?? 0);
@@ -12,7 +14,12 @@ if (!$row) {
 
 if (isset($_POST['submit'])) {
     $nama_fasilitas = mysqli_real_escape_string($conn, $_POST['nama_fasilitas']);
-    $jumlah = mysqli_real_escape_string($conn, $_POST['jumlah']);
+    $jumlah = filter_var($_POST['jumlah'] ?? '', FILTER_VALIDATE_INT);
+    if ($jumlah === false || $jumlah < 0) {
+        echo "<script>alert('Jumlah harus berupa angka bulat minimal 0.'); history.back();</script>";
+        exit;
+    }
+    $jumlah = mysqli_real_escape_string($conn, (string) $jumlah);
     $gambar_lama = basename($_POST['gambar_lama']);
 
     if ($_FILES['gambar']['error'] === 4) {
@@ -58,9 +65,10 @@ if (isset($_POST['submit'])) {
         h2 { margin-top: 0; color: #333; }
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: 500; color: #555; }
-        input[type="text"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        .btn-submit { background-color: #ffc107; color: #000; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: 500; }
-        .btn-submit:hover { background-color: #ffca2c; }
+        input[type="text"], input[type="number"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-family: 'Poppins', sans-serif; font-size: 15px; }
+        input[type="number"] { appearance: textfield; }
+        .btn-submit { background-color: #EEB006; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: 500; }
+        .btn-submit:hover { background-color: #D9A000; }
         .btn-back { background-color: #6c757d; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; display: inline-block; margin-left: 10px; }
         img.preview { width: 100px; margin-top: 10px; display: block; border-radius: 4px; }
     </style>
@@ -70,13 +78,14 @@ if (isset($_POST['submit'])) {
     <h2>Edit Data Fasilitas</h2>
     <form action="" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="gambar_lama" value="<?= $row['gambar']; ?>">
+        <?php preg_match('/\d+/', (string) $row['jumlah'], $jumlah_angka); ?>
         <div class="form-group">
             <label>Nama Fasilitas</label>
             <input type="text" name="nama_fasilitas" value="<?= htmlspecialchars($row['nama_fasilitas']); ?>" required>
         </div>
         <div class="form-group">
-            <label>Jumlah</label>
-            <input type="text" name="jumlah" value="<?= htmlspecialchars($row['jumlah']); ?>">
+            <label for="jumlah">Jumlah (Unit)</label>
+            <input type="number" id="jumlah" name="jumlah" min="0" step="1" value="<?= htmlspecialchars($jumlah_angka[0] ?? '0'); ?>" required>
         </div>
         <div class="form-group">
             <label>Gambar Fasilitas</label>

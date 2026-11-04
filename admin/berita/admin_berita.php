@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../../auth.php';
+wajib_admin('../../');
 require_once __DIR__ . '/../../koneksi.php';
 $query = mysqli_query($conn, "SELECT * FROM berita ORDER BY id DESC");
 ?>
@@ -18,7 +20,7 @@ $query = mysqli_query($conn, "SELECT * FROM berita ORDER BY id DESC");
         .main-content { flex: 1; padding: 30px; }
         h2 { margin-bottom: 20px; color: #333; }
         .btn { display: inline-block; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer; border: none; text-align: center; }
-        .btn-primary { background: #0066ff; color: #fff; margin-bottom: 20px; }
+        .btn-primary { background: #EEB006; color: #fff; margin-bottom: 20px; }
         .btn-warning { background: #ff9800; color: #fff; }
         .btn-danger { background: #f44336; color: #fff; }
         .btn-secondary { background: #b08d57; color: #fff; }

@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../auth.php';
+wajib_admin('../');
 // admin/index.php — Dashboard (halaman awal admin)
 require_once __DIR__ . '/../koneksi.php';
 

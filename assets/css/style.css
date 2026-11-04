@@ -53,6 +53,9 @@ nav a:hover, nav a.active { color: var(--gold); }
 .fasilitas div { background: var(--abu); border-left: 4px solid var(--gold); padding: 10px 14px; }
 .fasilitas strong { display: block; font-size: 15px; }
 .fasilitas small { font-size: 12px; }
+.fasilitas-selengkapnya { display: inline-flex; align-items: center; justify-content: center; align-self: center; justify-self: start;
+    padding: 7px 12px; background: var(--gold); color: #fff; border-radius: 4px 13px 13px 4px; font-size: 12px; font-weight: 600; transition: background .2s; }
+.fasilitas-selengkapnya:hover { background: #9c8647; }
 
 /* Galeri */
 .galeri { max-width: 1210px; margin: 0 auto 90px; padding: 0 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 20px; }

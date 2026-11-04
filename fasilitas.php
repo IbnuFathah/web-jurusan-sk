@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/koneksi.php';
 require_once __DIR__ . '/helpers.php';
+require_once __DIR__ . '/auth.php';
 
 $fasilitas = mysqli_query($conn, "SELECT * FROM fasilitas ORDER BY id ASC");
 ?>
@@ -23,10 +24,11 @@ $fasilitas = mysqli_query($conn, "SELECT * FROM fasilitas ORDER BY id ASC");
     <button class="menu-btn" aria-label="Buka menu">&#9776;</button>
     <nav id="menu">
         <a href="index.php">Home</a>
-        <a href="profile.html">Profile</a>
+        <a href="profile.php">Profile</a>
         <a href="berita.php">Berita</a>
         <a href="galeri.php">Galeri</a>
          <a href="fasilitas.php" class="active">Fasilitas</a>
+<?php include __DIR__ . '/partials/nav_auth.php'; ?>
     </nav>
 </header>
 
@@ -37,9 +39,7 @@ $fasilitas = mysqli_query($conn, "SELECT * FROM fasilitas ORDER BY id ASC");
         <img src="assets/img/fasilitas/<?= e($f['gambar']) ?>" class="card-img-top" alt="<?= e($f['nama_fasilitas']) ?>">
         <div class="card-body">
             <h3 class="card-title"><?= e($f['nama_fasilitas']) ?></h3>
-            <?php if (!empty($f['jumlah'])) : ?>
-            <small>Jumlah: <?= e($f['jumlah']) ?></small>
-            <?php endif; ?>
+            <small>Jumlah: <?= e(format_jumlah_fasilitas($f['jumlah'])) ?></small>
         </div>
     </div>
     <?php endwhile; ?>
@@ -70,7 +70,7 @@ $fasilitas = mysqli_query($conn, "SELECT * FROM fasilitas ORDER BY id ASC");
         <div>
             <h4>Link Cepat</h4>
             <a href="index.php">Beranda</a>
-            <a href="profile.html">Profile</a>
+            <a href="profile.php">Profile</a>
             <a href="galeri.php">Galeri</a>
             <a href="berita.php">Berita</a>
             <a href="#kontak">Kontak</a>

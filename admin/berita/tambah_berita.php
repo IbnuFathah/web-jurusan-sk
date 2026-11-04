@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../../auth.php';
+wajib_admin('../../');
 require_once __DIR__ . '/../../koneksi.php';
 
 if (isset($_POST['submit'])) {
@@ -54,7 +56,7 @@ if (isset($_POST['submit'])) {
         label { display: block; margin-bottom: 5px; font-weight: 500; color: #444; }
         input[type="text"], input[type="date"], textarea, input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
         textarea { height: 100px; resize: vertical; }
-        .btn { background: #0066ff; color: #fff; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; }
+        .btn { background: #EEB006; color: #fff; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; }
         .btn-back { background: #6c757d; text-decoration: none; display: inline-block; padding: 10px 20px; border-radius: 6px; color: #fff; margin-right: 10px; }
         .error { color: red; margin-bottom: 15px; font-size: 14px; }
     </style>

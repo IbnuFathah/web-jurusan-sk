@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../../auth.php';
+wajib_admin('../../');
 require_once __DIR__ . '/../../koneksi.php';
 $query = "SELECT * FROM fasilitas ORDER BY id DESC";
 $result = mysqli_query($conn,$query);
@@ -34,7 +36,7 @@ $result = mysqli_query($conn,$query);
         }
         .btn-tambah {
             display: inline-block;
-            background-color: #eeb006;
+            background-color: #EEB006;
             color: white;
             padding: 10px 20px;
             border-radius: 6px;
@@ -44,7 +46,7 @@ $result = mysqli_query($conn,$query);
             transition: background 0.2s;
         }
         .btn-tambah:hover {
-            background-color: #f5bf0f;
+            background-color: #D9A000;
         }
         .card-grid {
             display: grid;

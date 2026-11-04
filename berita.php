@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/koneksi.php';
 require_once __DIR__ . '/helpers.php';
+require_once __DIR__ . '/auth.php';
 
 $berita = mysqli_query($conn, "SELECT * FROM berita ORDER BY tanggal_publikasi DESC, id DESC");
 ?>
@@ -22,10 +23,11 @@ $berita = mysqli_query($conn, "SELECT * FROM berita ORDER BY tanggal_publikasi D
     <button class="menu-btn" aria-label="Buka menu">&#9776;</button>
     <nav id="menu">
         <a href="index.php">Home</a>
-        <a href="profile.html">Profile</a>
+        <a href="profile.php">Profile</a>
         <a href="berita.php" class="active">Berita</a>
         <a href="galeri.php">Galeri</a>
          <a href="fasilitas.php">Fasilitas</a>
+<?php include __DIR__ . '/partials/nav_auth.php'; ?>
     </nav>
 </header>
 <h2 class="judul">Prestasi &amp; Berita Terkini</h2>
@@ -60,8 +62,8 @@ $berita = mysqli_query($conn, "SELECT * FROM berita ORDER BY tanggal_publikasi D
         </div>
         <!-- <div>
             <h4>Jurusan</h4>
-            <a href="profile.html">Seni Pertunjukan</a>
-            <a href="profile.html">Seni Karawitan</a>
+            <a href="profile.php">Seni Pertunjukan</a>
+            <a href="profile.php">Seni Karawitan</a>
         </div> -->
         <div>
             <h4>Hubungi Kami</h4>
@@ -72,7 +74,7 @@ $berita = mysqli_query($conn, "SELECT * FROM berita ORDER BY tanggal_publikasi D
         <div>
             <h4>Link Cepat</h4>
             <a href="index.php">Beranda</a>
-            <a href="profile.html">Profile</a>
+            <a href="profile.php">Profile</a>
             <a href="galeri.php">Galeri</a>
             <a href="berita.php">Berita</a>
             <a href="#kontak">Kontak</a>

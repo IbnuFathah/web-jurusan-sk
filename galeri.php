@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/koneksi.php';
 require_once __DIR__ . '/helpers.php';
+require_once __DIR__ . '/auth.php';
 
 $galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC");
 ?>
@@ -22,10 +23,11 @@ $galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC");
     <button class="menu-btn" aria-label="Buka menu">&#9776;</button>
     <nav id="menu">
         <a href="index.php">Home</a>
-        <a href="profile.html">Profile</a>
+        <a href="profile.php">Profile</a>
         <a href="berita.php">Berita</a>
         <a href="galeri.php" class="active">Galeri</a>
          <a href="fasilitas.php">Fasilitas</a>
+<?php include __DIR__ . '/partials/nav_auth.php'; ?>
         <!-- <a href="#kontak">Kontak</a> -->
     </nav>
 </header>
@@ -54,8 +56,8 @@ $galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC");
         </div>
         <div>
             <!-- <h4>Jurusan</h4>
-            <a href="profile.html">Seni Pertunjukan</a>
-            <a href="profile.html">Seni Karawitan</a> -->
+            <a href="profile.php">Seni Pertunjukan</a>
+            <a href="profile.php">Seni Karawitan</a> -->
         </div>
         <div>
             <h4>Hubungi Kami</h4>
@@ -66,7 +68,7 @@ $galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC");
         <div>
             <h4>Link Cepat</h4>
             <a href="index.php">Beranda</a>
-            <a href="profile.html">Profile</a>
+            <a href="profile.php">Profile</a>
             <a href="galeri.php">Galeri</a>
             <a href="berita.php">Berita</a>
             <a href="#kontak">Kontak</a>

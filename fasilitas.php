@@ -1,70 +1,51 @@
+<?php
+require_once __DIR__ . '/koneksi.php';
+require_once __DIR__ . '/helpers.php';
+
+$fasilitas = mysqli_query($conn, "SELECT * FROM fasilitas ORDER BY id ASC");
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Berita | SMKN 1 Kawali</title>
+    <title>Fasilitas | SMKN 1 Kawali</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
     
 </head>
 <body>
 <header class="navbar">
-    <a href="index.html" class="brand">
+    <a href="index.php" class="brand">
         <img src="assets/img/logo.png" alt="Logo SMKN 1 Kawali">
         <div><strong>SMKN 1 KAWALI</strong><small>JURUSAN SP &amp; SK</small></div>
     </a>
     <button class="menu-btn" aria-label="Buka menu">&#9776;</button>
     <nav id="menu">
-        <a href="index.html">Home</a>
+        <a href="index.php">Home</a>
         <a href="profile.html">Profile</a>
-        <a href="berita.html">Berita</a>
-        <a href="galeri.html">Galeri</a>
-         <a href="fasilitas.html" class="active">Fasilitas</a>
+        <a href="berita.php">Berita</a>
+        <a href="galeri.php">Galeri</a>
+         <a href="fasilitas.php" class="active">Fasilitas</a>
     </nav>
 </header>
 
 <h2 class="judul">Fasilitas Praktik Jurusan SP</h2>
 <section class="berita">
-    
-    
+    <?php while ($f = mysqli_fetch_assoc($fasilitas)) : ?>
     <div class="card" style="width: 18rem;">
-        <img src="assets/img/fasilitas/gamelanDegung.jpg" class="card-img-top" alt="Juara 3 FLS3N Jawa Barat">
+        <img src="assets/img/fasilitas/<?= e($f['gambar']) ?>" class="card-img-top" alt="<?= e($f['nama_fasilitas']) ?>">
         <div class="card-body">
-            <h3 class="card-title">Gamelan Degung</h3>
+            <h3 class="card-title"><?= e($f['nama_fasilitas']) ?></h3>
+            <?php if (!empty($f['jumlah'])) : ?>
+            <small>Jumlah: <?= e($f['jumlah']) ?></small>
+            <?php endif; ?>
         </div>
     </div>
-    <div class="card" style="width: 18rem;">
-        <img src="assets/img/fasilitas/gamelanSalendro.jpg" class="card-img-top" alt="Juara 3 FLS3N Jawa Barat">
-        <div class="card-body">
-            <h3 class="card-title">Gamelan Salendro</h3>
-        </div>
-    </div>
-    <div class="card" style="width: 18rem;">
-        <img src="assets/img/fasilitas/kecapi.jpg" class="card-img-top" alt="Juara 3 FLS3N Jawa Barat">
-        <div class="card-body">
-            <h3 class="card-title">Kecapi</h3>
-        </div>
-    </div>
-    <div class="card" style="width: 18rem;">
-        <img src="assets/img/fasilitas/kendang.jpg" class="card-img-top" alt="Juara 3 FLS3N Jawa Barat">
-        <div class="card-body">
-            <h3 class="card-title">Kendang</h3>
-        </div>
-    </div>
-    <div class="card" style="width: 18rem;">
-        <img src="assets/img/fasilitas/lighting.webp" class="card-img-top" alt="Juara Harapan 1 FLS3N">
-        <div class="card-body">
-            <h3 class="card-title">lighting</h3>
-        </div>
-    </div>
-    <div class="card" style="width: 18rem;">
-        <img src="assets/img/fasilitas/soundSistem.jpg" class="card-img-top" alt="Pengisi Acara Event Daerah">
-        <div class="card-body">
-            <h3 class="card-title">Sound Sistem</h3>
-        </div>
-    </div>
-
+    <?php endwhile; ?>
+    <?php if (mysqli_num_rows($fasilitas) == 0) : ?>
+    <p style="grid-column: 1 / -1; text-align: center;">Belum ada data fasilitas.</p>
+    <?php endif; ?>
 </section>
 
 <footer id="kontak">
@@ -88,10 +69,10 @@
         </div>
         <div>
             <h4>Link Cepat</h4>
-            <a href="index.html">Beranda</a>
+            <a href="index.php">Beranda</a>
             <a href="profile.html">Profile</a>
-            <a href="galeri.html">Galeri</a>
-            <a href="berita.html">Berita</a>
+            <a href="galeri.php">Galeri</a>
+            <a href="berita.php">Berita</a>
             <a href="#kontak">Kontak</a>
         </div>
     </div>

@@ -1,3 +1,11 @@
+<?php
+require_once __DIR__ . '/koneksi.php';
+require_once __DIR__ . '/helpers.php';
+
+// 3 berita terbaru & 4 foto galeri terbaru untuk ditampilkan di beranda
+$berita = mysqli_query($conn, "SELECT * FROM berita ORDER BY tanggal_publikasi DESC, id DESC LIMIT 3");
+$galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 4");
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -9,17 +17,17 @@
 </head>
 <body>
 <header class="navbar">
-    <a href="index.html" class="brand">
+    <a href="index.php" class="brand">
         <img src="assets/img/logo.png" alt="Logo SMKN 1 Kawali">
         <div><strong>SMKN 1 KAWALI</strong><small>JURUSAN SP &amp; SK</small></div>
     </a>
     <button class="menu-btn" aria-label="Buka menu">&#9776;</button>
     <nav id="menu">
-        <a href="index.html" class="active">Home</a>
+        <a href="index.php" class="active">Home</a>
         <a href="profile.html">Profile</a>
-        <a href="berita.html">Berita</a>
-        <a href="galeri.html">Galeri</a>
-         <a href="fasilitas.html">Fasilitas</a>
+        <a href="berita.php">Berita</a>
+        <a href="galeri.php">Galeri</a>
+         <a href="fasilitas.php">Fasilitas</a>
         <!-- <a href="#kontak">Kontak</a> -->
     </nav>
 </header>
@@ -51,36 +59,20 @@
     <div class="container">
         <h2 class="section-title">PRESTASI & BERITA TERKINI</h2>
         <div class="news-grid">
-            <!-- Card 1 -->
+            <?php while ($b = mysqli_fetch_assoc($berita)) : ?>
             <div class="news-card">
-                <img src="assets/img/berita2.jpg" alt="Juara 3 FLS2N">
+                <img src="assets/img/berita/<?= e($b['gambar']) ?>" alt="<?= e($b['judul']) ?>">
                 <div class="news-content">
-                    <h3 class="gold-text">Juara 3 FLS2N Jawa Barat</h3>
-                    <small>1 Agustus 2026</small>
-                    <p>Siswa jurusan SP & SK berhasil meraih Juara 3 FLS2N tingkat Jawa Barat dalam kategori Musik Tradisional.</p>
-                    <a href="detailBerita.html?id=1" class="btn-gold">Baca Selengkapnya</a>
+                    <h3 class="gold-text"><?= e($b['judul']) ?></h3>
+                    <small><?= tanggal_indo($b['tanggal_publikasi']) ?></small>
+                    <p><?= e($b['ringkasan']) ?></p>
+                    <a href="detailBerita.php?id=<?= (int) $b['id'] ?>" class="btn-gold">Baca Selengkapnya</a>
                 </div>
             </div>
-            <!-- Card 2 -->
-            <div class="news-card">
-                <img src="assets/img/berita1.jpg" alt="Juara Harapan 1">
-                <div class="news-content">
-                    <h3 class="gold-text">Juara Harapan 1 FLS2N</h3>
-                    <small>1 Agustus 2026</small>
-                    <p>Selain musik tradisional, perwakilan jurusan juga meraih Juara Harapan 1 tingkat Jawa Barat dalam kategori Vocal.</p>
-                    <a href="detailBerita.html?id=2" class="btn-gold">Baca Selengkapnya</a>
-                </div>
-            </div>
-            <!-- Card 3 -->
-            <div class="news-card">
-                <img src="assets/img/galeri4.jpg" alt="Pengisi Acara">
-                <div class="news-content">
-                    <h3 class="gold-text">Pengisi Acara Event Daerah</h3>
-                    <small>Baru-baru ini</small>
-                    <p>Siswa-siswi secara rutin melatih mental dan skill dengan mengisi berbagai acara di beberapa event penting tingkat daerah.</p>
-                    <a href="detailBerita.html?id=3" class="btn-gold">Baca Selengkapnya</a>
-                </div>
-            </div>
+            <?php endwhile; ?>
+            <?php if (mysqli_num_rows($berita) == 0) : ?>
+            <p>Belum ada berita.</p>
+            <?php endif; ?>
         </div>
     </div>
 </section>
@@ -90,13 +82,12 @@
     <div class="container">
         <h2 class="section-title">GALERI JURUSAN</h2>
         <div class="gallery-grid-home">
-            <img src="assets/img/Galeri.jpg" alt="Galeri 3">
-            <img src="assets/img/galeri1.jpg" alt="Galeri 1">
-            <img src="assets/img/galeri2.jpg" alt="Galeri 2">
-            <img src="assets/img/galeri4.jpg" alt="Galeri 4">
+            <?php while ($g = mysqli_fetch_assoc($galeri)) : ?>
+            <img src="assets/img/galeri/<?= e($g['file_gambar']) ?>" alt="<?= e($g['judul_gambar']) ?>">
+            <?php endwhile; ?>
         </div>
         <div class="text-center" style="margin-top: 2rem;">
-            <a href="galeri.html" class="btn">Lihat Semua Galeri</a>
+            <a href="galeri.php" class="btn">Lihat Semua Galeri</a>
         </div>
     </div>
 </section>
@@ -126,10 +117,10 @@
         </div>
         <div>
             <h4>Link Cepat</h4>
-            <a href="index.html">Beranda</a>
+            <a href="index.php">Beranda</a>
             <a href="profile.html">Profile</a>
-            <a href="galeri.html">Galeri</a>
-            <a href="berita.html">Berita</a>
+            <a href="galeri.php">Galeri</a>
+            <a href="berita.php">Berita</a>
             <a href="#kontak">Kontak</a>
         </div>
     </div>

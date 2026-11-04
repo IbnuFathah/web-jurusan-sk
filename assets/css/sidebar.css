@@ -1,0 +1,189 @@
+/* sidebar.css */
+.sidebar {
+  --sb-bg: #181818;
+  --sb-border: #2f2f2f;
+  --sb-gold: #b79d63;
+  --sb-text: #a3a3a3;
+  --sb-text-active: #ededed;
+  --sb-label: #8a8a8a;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 302px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--sb-bg);
+  border: 1px solid var(--sb-border);
+  border-radius: 16px;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--sb-text);
+  box-sizing: border-box;
+  z-index: 50;
+}
+.sidebar *,
+.sidebar *::before,
+.sidebar *::after { box-sizing: border-box; }
+
+/* ---------- Header ---------- */
+.sidebar__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 72px;
+  padding: 0 0 0 6px;
+  border-bottom: 1px solid var(--sb-border);
+}
+.sidebar__logo {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.sidebar__brand { min-width: 0; }
+.sidebar__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 26px;
+  letter-spacing: 0.2px;
+  color: var(--sb-gold);
+  white-space: nowrap;
+}
+.sidebar__subtitle {
+  margin: 0;
+  font-size: 14px;
+  line-height: 18px;
+  color: #fff;
+}
+
+/* ---------- Tombol toggle ---------- */
+.sidebar__toggle {
+  position: absolute;
+  top: 59px;
+  right: -1px;
+  width: 27px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background: var(--sb-bg);
+  border: 1px solid #4a4a4a;
+  border-radius: 8px;
+  color: #e5e5e5;
+  cursor: pointer;
+}
+.sidebar__toggle svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---------- Nav ---------- */
+.sidebar__nav {
+  flex: 1;
+  padding: 22px 28px 0 28px;
+  overflow-y: auto;
+}
+.sidebar__label {
+  margin: 0 0 6px 9px;
+  height: 18px;
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: 0.3px;
+  color: var(--sb-label);
+}
+.sidebar__label--spaced { margin-top: 28px; }
+
+.sidebar__menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  height: 48px;
+  padding: 0 9px;
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--sb-text);
+  text-decoration: none;
+  transition: color .15s ease;
+}
+.sidebar__link svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.sidebar__link:hover,
+.sidebar__link.active { color: var(--sb-text-active); }
+
+.sidebar__chevron {
+  margin-left: auto;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* ---------- Footer ---------- */
+.sidebar__footer {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 0 0 28px 44px;
+}
+.sidebar__theme {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--sb-text);
+  cursor: pointer;
+}
+.sidebar__theme svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.sidebar__theme--active {
+  padding: 0 24px;
+  border-color: #4a4a4a;
+  color: #fff;
+}
+.sidebar__theme:focus-visible,
+.sidebar__toggle:focus-visible,
+.sidebar__link:focus-visible {
+  outline: 2px solid var(--sb-gold);
+  outline-offset: 2px;
+}
+
+/* ---------- Tambahan integrasi admin ---------- */
+/* Header sidebar jadi link ke website publik */
+a.sidebar__header { text-decoration: none; color: inherit; }
+
+/* Sidebar bersifat fixed (lebar 302px), jadi konten digeser agar tidak tertutup */
+.main-content { margin-left: 302px; }
+
+/* Supaya font sidebar tetap Inter walau halaman memakai "* { font-family: ... }" */
+.sidebar * { font-family: inherit; }

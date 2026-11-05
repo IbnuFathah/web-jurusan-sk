@@ -22,7 +22,7 @@ if (isset($_POST['login'])) {
     $u = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 
     if ($u && password_verify($password, $u['password'])) {
-        session_regenerate_id(true);   // cegah session fixation
+        session_regenerate_id(true);   
         $_SESSION['user'] = [
             'id'    => (int) $u['id'],
             'nama'  => $u['nama_lengkap'],

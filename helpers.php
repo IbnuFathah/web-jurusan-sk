@@ -36,4 +36,21 @@ function paragraf($teks) {
     }
     return $hasil;
 }
+
+// Data tabel pengaturan_web (cukup 1 baris: sejarah, alamat, email, telepon, sosmed).
+// Dipanggil berkali-kali pun query-nya hanya sekali. Kalau tabel kosong -> array kosong.
+function ambil_pengaturan($conn) {
+    static $cache = null;
+    if ($cache === null) {
+        $res   = mysqli_query($conn, "SELECT * FROM pengaturan_web ORDER BY id ASC LIMIT 1");
+        $cache = ($res ? mysqli_fetch_assoc($res) : null) ?: [];
+    }
+    return $cache;
+}
+
+// Hanya izinkan link http/https (cegah "javascript:" di link sosmed). Selain itu -> ''.
+function url_aman($url) {
+    $url = trim((string) $url);
+    return preg_match('#^https?://#i', $url) ? $url : '';
+}
 ?>

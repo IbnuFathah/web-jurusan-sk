@@ -48,36 +48,7 @@ $fasilitas = mysqli_query($conn, "SELECT * FROM fasilitas ORDER BY id ASC");
     <?php endif; ?>
 </section>
 
-<footer id="kontak">
-    <h2>KONTAK KAMI</h2>
-    <div class="footer-grid">
-        <div class="footer-about">
-            <div class="footer-logo"><img src="assets/img/logo.png" alt="Logo"><span>SMKN 1 KAWALI</span></div>
-            <p>Jurusan Seni Pertunjukan &amp; Seni Karawitan SMKN 1 Kawali. Mewadahi kreativitas, melestarikan budaya, dan menciptakan seniman muda berbakat.</p>
-            <div class="sosmed">
-                <a href="#" style="background:#1877f2" aria-label="Facebook">f</a>
-                <a href="#" style="background:#1da1f2" aria-label="Twitter">t</a>
-                <a href="#" style="background:#e1306c" aria-label="Instagram">ig</a>
-                <a href="#" style="background:#0a66c2" aria-label="LinkedIn">in</a>
-            </div>
-        </div>
-        <div>
-            <h4>Hubungi Kami</h4>
-            <a href="#">Kawali, Ciamis, Jawa Barat</a>
-            <a href="#">email@sekolah.sch.id</a>
-            <a href="#">(0265) 000000</a>
-        </div>
-        <div>
-            <h4>Link Cepat</h4>
-            <a href="index.php">Beranda</a>
-            <a href="profile.php">Profile</a>
-            <a href="galeri.php">Galeri</a>
-            <a href="berita.php">Berita</a>
-            <a href="#kontak">Kontak</a>
-        </div>
-    </div>
-    <p class="copy">&copy; 2026 SMKN 1 Kawali - Jurusan SP &amp; SK. All rights reserved.</p>
-</footer>
+<?php include __DIR__ . '/partials/footer.php'; ?>
 <script src="assets/js/script.js"></script>
 </body>
 </html>

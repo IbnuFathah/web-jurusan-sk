@@ -7,6 +7,10 @@ $fasilitas = mysqli_query($conn, "SELECT nama_fasilitas, jumlah FROM fasilitas O
 if (!$fasilitas) {
     die('Gagal memuat data fasilitas: ' . mysqli_error($conn));
 }
+
+// Sejarah singkat (tabel pengaturan_web) & daftar guru (tabel guru)
+$pengaturan = ambil_pengaturan($conn);
+$guru = mysqli_query($conn, "SELECT nama_guru, jabatan FROM guru ORDER BY id ASC");
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -39,15 +43,22 @@ if (!$fasilitas) {
     <img src="assets/img/profile.jpg" alt="Juara Umum FLS2N Kabupaten Ciamis 2024">
     <div>
         <h3>Sejarah Singkat</h3>
-        <p>Jurusan Seni Pertunjukan (SP) atau Seni Karawitan (SK) di SMKN 1 Kawali berdiri pada tahun 2016 didirikan oleh Pak Tisno. Awalnya 1 kelas berisi 18 siswa, kini berkembang menjadi 6 kelas dengan jumlah 25-30 siswa per kelas.</p>
+        <?php if (trim($pengaturan['sejarah_singkat'] ?? '') !== '') : ?>
+        <?= paragraf($pengaturan['sejarah_singkat']) ?>
+        <?php else : ?>
+        <p>Belum ada data sejarah.</p>
+        <?php endif; ?>
 
         <h3>Daftar Guru Pengajar</h3>
         <p>Jurusan kami dibimbing oleh tenaga pendidik profesional di bidang seni.</p>
         <button class="btn" id="btnGuru">Lihat Daftar Guru</button>
         <ul id="listGuru">
-            <li>Nama Guru 1 - Mata pelajaran</li>
-            <li>Nama Guru 2 - Mata pelajaran</li>
-            <li>Nama Guru 3 - Mata pelajaran</li>
+            <?php while ($g = mysqli_fetch_assoc($guru)) : ?>
+            <li><?= e($g['nama_guru']) ?> - <?= e($g['jabatan']) ?></li>
+            <?php endwhile; ?>
+            <?php if (mysqli_num_rows($guru) === 0) : ?>
+            <li>Belum ada data guru.</li>
+            <?php endif; ?>
         </ul>
 
         <h3>Fasilitas Praktik</h3>
@@ -65,41 +76,7 @@ if (!$fasilitas) {
         </div>
     </div>
 </section>
-<footer id="kontak">
-    <h2>KONTAK KAMI</h2>
-    <div class="footer-grid">
-        <div class="footer-about">
-            <div class="footer-logo"><img src="assets/img/logo.png" alt="Logo"><span>SMKN 1 KAWALI</span></div>
-            <p>Jurusan Seni Pertunjukan &amp; Seni Karawitan SMKN 1 Kawali. Mewadahi kreativitas, melestarikan budaya, dan menciptakan seniman muda berbakat.</p>
-            <div class="sosmed">
-                <a href="#" style="background:#1877f2" aria-label="Facebook">f</a>
-                <a href="#" style="background:#1da1f2" aria-label="Twitter">t</a>
-                <a href="#" style="background:#e1306c" aria-label="Instagram">ig</a>
-                <a href="#" style="background:#0a66c2" aria-label="LinkedIn">in</a>
-            </div>
-        </div>
-        <!-- <div>
-            <h4>Jurusan</h4>
-            <a href="profile.php">Seni Pertunjukan</a>
-            <a href="profile.php">Seni Karawitan</a>
-        </div> -->
-        <div>
-            <h4>Hubungi Kami</h4>
-            <a href="#">Kawali, Ciamis, Jawa Barat</a>
-            <a href="#">email@sekolah.sch.id</a>
-            <a href="#">(0265) 000000</a>
-        </div>
-        <div>
-            <h4>Link Cepat</h4>
-            <a href="index.php">Beranda</a>
-            <a href="profile.php">Profile</a>
-            <a href="galeri.php">Galeri</a>
-            <a href="berita.php">Berita</a>
-            <a href="#kontak">Kontak</a>
-        </div>
-    </div>
-    <p class="copy">&copy; 2026 SMKN 1 Kawali - Jurusan SP &amp; SK. All rights reserved.</p>
-</footer>
+<?php include __DIR__ . '/partials/footer.php'; ?>
 <script src="assets/js/script.js"></script>
 </body>
 </html>

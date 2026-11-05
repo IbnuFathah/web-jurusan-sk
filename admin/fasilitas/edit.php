@@ -60,41 +60,41 @@ if (isset($_POST['submit'])) {
     <title>Edit Fasilitas | Admin SMKN 1 Kawali</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #f4f6f9; margin: 0; padding: 40px; }
-        .container { max-width: 600px; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin: auto; }
-        h2 { margin-top: 0; color: #333; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 500; color: #555; }
-        input[type="text"], input[type="number"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-family: 'Poppins', sans-serif; font-size: 15px; }
-        input[type="number"] { appearance: textfield; }
-        .btn-submit { background-color: #EEB006; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: 500; }
-        .btn-submit:hover { background-color: #D9A000; }
-        .btn-back { background-color: #6c757d; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; display: inline-block; margin-left: 10px; }
-        img.preview { width: 100px; margin-top: 10px; display: block; border-radius: 4px; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: #f4f6f9; padding: 40px 20px; margin: 0; }
+        .form-container { background: white; max-width: 500px; margin: 0 auto; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { margin: 0 0 20px; font-size: 20px; color: #333; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 14px; }
+        input[type="text"], input[type="number"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; font-family: inherit; }
+        .btn-submit { background: #EEB006; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: 500; }
+        .btn-submit:hover { background: #D9A000; }
+        .btn-kembali { background: #6c757d; text-decoration: none; color: white; padding: 9px 20px; border-radius: 5px; display: inline-block; font-size: 14px; margin-left: 10px; }
+        img.preview { width: 100%; max-height: 240px; object-fit: cover; margin: 0 0 10px; display: block; border-radius: 5px; }
     </style>
 </head>
 <body>
-<div class="container">
+<div class="form-container">
     <h2>Edit Data Fasilitas</h2>
     <form action="" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="gambar_lama" value="<?= $row['gambar']; ?>">
         <?php preg_match('/\d+/', (string) $row['jumlah'], $jumlah_angka); ?>
         <div class="form-group">
-            <label>Nama Fasilitas</label>
-            <input type="text" name="nama_fasilitas" value="<?= htmlspecialchars($row['nama_fasilitas']); ?>" required>
+            <label for="nama_fasilitas">Nama Fasilitas</label>
+            <input type="text" id="nama_fasilitas" name="nama_fasilitas" value="<?= htmlspecialchars($row['nama_fasilitas']); ?>" required>
         </div>
         <div class="form-group">
             <label for="jumlah">Jumlah (Unit)</label>
             <input type="number" id="jumlah" name="jumlah" min="0" step="1" value="<?= htmlspecialchars($jumlah_angka[0] ?? '0'); ?>" required>
         </div>
         <div class="form-group">
-            <label>Gambar Fasilitas</label>
-            <img src="../../assets/img/fasilitas/<?= htmlspecialchars($row['gambar']); ?>" class="preview" alt="Preview">
+            <label for="gambar">Gambar Fasilitas</label>
+            <img src="../../assets/img/fasilitas/<?= htmlspecialchars($row['gambar']); ?>" class="preview" alt="Preview gambar fasilitas">
             <small style="color: #777;">Biarkan kosong jika tidak ingin mengubah gambar.</small>
-            <input type="file" name="gambar" style="margin-top: 8px;">
+            <input type="file" id="gambar" name="gambar" accept=".jpg,.jpeg,.png,.webp" style="margin-top: 8px;">
         </div>
         <button type="submit" name="submit" class="btn-submit">Perbarui</button>
-        <a href="index.php" class="btn-back">Kembali</a>
+        <a href="index.php" class="btn-kembali">Kembali</a>
     </form>
 </div>
 </body>

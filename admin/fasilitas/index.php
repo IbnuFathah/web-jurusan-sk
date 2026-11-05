@@ -27,11 +27,10 @@ $result = mysqli_query($conn,$query);
         .gallery-card .card-body { padding: 15px; }
         .gallery-card h3 { font-size: 15px; font-weight: 600; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 5px; }
         .gallery-card p { color: #777; font-size: 13px; }
-        .btn-hapus, .btn-edit { position: absolute; top: 10px; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; text-decoration: none; background: rgba(0, 0, 0, 0.6); }
-        .btn-hapus { right: 10px; }
-        .btn-hapus:hover { background: #dc3545; }
-        .btn-edit { right: 52px; }
-        .btn-edit:hover { background: #EEB006; }
+        .card-footer { padding: 0 15px 15px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn { display: inline-block; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer; border: none; text-align: center; }
+        .btn-warning { background: #ff9800; color: #fff; }
+        .btn-danger { background: #f44336; color: #fff; }
     </style>
 </head>
 <body>
@@ -49,12 +48,14 @@ include __DIR__ . '/../sidebar.php';
     <div class="gallery-grid">
         <?php while ($row = mysqli_fetch_assoc($result)) : ?>
         <div class="gallery-card">
-            <a href="edit.php?id=<?= (int) $row['id']; ?>" class="btn-edit" title="Edit" aria-label="Edit fasilitas">&#9998;</a>
-            <a href="hapus.php?id=<?= (int) $row['id']; ?>" class="btn-hapus" onclick="return confirm('Yakin ingin menghapus fasilitas ini?')" title="Hapus" aria-label="Hapus fasilitas">&#128465;</a>
             <img src="../../assets/img/fasilitas/<?= htmlspecialchars($row['gambar']); ?>" alt="<?= htmlspecialchars($row['nama_fasilitas']); ?>">
             <div class="card-body">
                 <h3><?= htmlspecialchars($row['nama_fasilitas']); ?></h3>
                 <p>Jumlah: <?= htmlspecialchars($row['jumlah']); ?> unit</p>
+            </div>
+            <div class="card-footer">
+                <a href="hapus.php?id=<?= (int) $row['id']; ?>" class="btn btn-danger" onclick="return confirm('Yakin ingin menghapus fasilitas ini?')">Hapus</a>
+                <a href="edit.php?id=<?= (int) $row['id']; ?>" class="btn btn-warning">Edit</a>
             </div>
         </div>
         <?php endwhile; ?>

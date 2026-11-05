@@ -13,6 +13,7 @@ $fasilitas = mysqli_query($conn, "SELECT * FROM fasilitas ORDER BY id ASC");
     <title>Fasilitas | SMKN 1 Kawali</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/auth.css?v=<?= filemtime(__DIR__ . '/assets/css/auth.css') ?>">
     
 </head>
 <body>
@@ -49,6 +50,6 @@ $fasilitas = mysqli_query($conn, "SELECT * FROM fasilitas ORDER BY id ASC");
 </section>
 
 <?php include __DIR__ . '/partials/footer.php'; ?>
-<script src="assets/js/script.js"></script>
+<script src="assets/js/script.js?v=<?= filemtime(__DIR__ . '/assets/js/script.js') ?>"></script>
 </body>
 </html>

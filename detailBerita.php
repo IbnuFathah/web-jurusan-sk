@@ -19,6 +19,7 @@ if (!$row) {
     <title><?= $row ? e($row['judul']) : 'Berita Tidak Ditemukan' ?> | SMKN 1 Kawali</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/auth.css?v=<?= filemtime(__DIR__ . '/assets/css/auth.css') ?>">
 </head>
 <body>
 <header class="navbar">
@@ -71,6 +72,6 @@ if (!$row) {
 </main>
 
 <?php include __DIR__ . '/partials/footer.php'; ?>
-<script src="assets/js/script.js"></script>
+<script src="assets/js/script.js?v=<?= filemtime(__DIR__ . '/assets/js/script.js') ?>"></script>
 </body>
 </html>

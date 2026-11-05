@@ -24,10 +24,10 @@ require_once __DIR__ . '/../../koneksi.php';
         .gallery-card img { width: 100%; height: 200px; object-fit: cover; display: block; }
         .gallery-card .card-body { padding: 15px; }
         .gallery-card h4 { font-size: 15px; font-weight: 600; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .btn-hapus { position: absolute; top: 10px; right: 10px; background: rgba(0, 0, 0, 0.6); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; text-decoration: none; }
-        .btn-hapus:hover { background: #dc3545; }
-        .btn-edit { position: absolute; top: 10px; right: 52px; background: rgba(0, 0, 0, 0.6); color: white; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; text-decoration: none; }
-        .btn-edit:hover { background: #EEB006; }
+        .card-footer { padding: 0 15px 15px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn { display: inline-block; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer; border: none; text-align: center; }
+        .btn-warning { background: #ff9800; color: #fff; }
+        .btn-danger { background: #f44336; color: #fff; }
     </style>
 </head>
 <body>
@@ -49,11 +49,13 @@ include __DIR__ . '/../sidebar.php';
                 while ($row = mysqli_fetch_assoc($query)) {
             ?>
                 <div class="gallery-card">
-                    <a href="edit_galeri.php?id=<?= (int) $row['id']; ?>" class="btn-edit" title="Edit" aria-label="Edit galeri">✎</a>
-                    <a href="hapus_galeri.php?id=<?= $row['id']; ?>" class="btn-hapus" onclick="return confirm('Yakin ingin menghapus gambar ini?');" title="Hapus">🗑</a>
                     <img src="../../assets/img/galeri/<?= htmlspecialchars($row['file_gambar']); ?>" alt="<?= htmlspecialchars($row['judul_gambar']); ?>">
                     <div class="card-body">
                         <h4><?= htmlspecialchars($row['judul_gambar']); ?></h4>
+                    </div>
+                    <div class="card-footer">
+                        <a href="hapus_galeri.php?id=<?= (int) $row['id']; ?>" class="btn btn-danger" onclick="return confirm('Yakin ingin menghapus gambar ini?');">Hapus</a>
+                        <a href="edit_galeri.php?id=<?= (int) $row['id']; ?>" class="btn btn-warning">Edit</a>
                     </div>
                 </div>
             <?php 

@@ -29,10 +29,21 @@ if (isset($_POST['login'])) {
             'email' => $u['email'],
             'role'  => $u['role'],
         ];
+        if (($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'XMLHttpRequest') {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['redirect' => $u['role'] === 'admin' ? 'admin/index.php' : 'index.php']);
+            exit;
+        }
         header('Location: ' . ($u['role'] === 'admin' ? 'admin/index.php' : 'index.php'));
         exit;
     }
     $error = 'Email atau password salah.';
+    if (($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'XMLHttpRequest') {
+        http_response_code(401);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['error' => $error]);
+        exit;
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -43,10 +54,11 @@ if (isset($_POST['login'])) {
     <title>Login | SMKN 1 Kawali</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/auth.css">
+    <link rel="stylesheet" href="assets/css/auth.css?v=<?= filemtime(__DIR__ . '/assets/css/auth.css') ?>">
 </head>
 <body class="auth-page">
     <div class="auth-card">
+        <a href="index.php" class="auth-close" aria-label="Tutup dan kembali ke beranda" title="Kembali ke beranda">&times;</a>
         <a href="index.php" class="auth-brand">
             <img src="assets/img/logo.png" alt="Logo SMKN 1 Kawali">
             <div><strong>SMKN 1 KAWALI</strong><small>JURUSAN SP &amp; SK</small></div>
@@ -61,7 +73,7 @@ if (isset($_POST['login'])) {
             <input type="password" id="password" name="password" required>
             <button type="submit" name="login">Masuk</button>
         </form>
-        <p class="auth-foot">Belum punya akun? <a href="register.php">Daftar</a> &middot; <a href="index.php">Kembali ke beranda</a></p>
+        <p class="auth-foot">Belum punya akun? <a href="register.php">Daftar</a></p>
     </div>
 </body>
 </html>

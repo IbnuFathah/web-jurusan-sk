@@ -13,6 +13,7 @@ $berita = mysqli_query($conn, "SELECT * FROM berita ORDER BY tanggal_publikasi D
     <title>Berita | SMKN 1 Kawali</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/auth.css?v=<?= filemtime(__DIR__ . '/assets/css/auth.css') ?>">
 </head>
 <body>
 <header class="navbar">
@@ -48,6 +49,6 @@ $berita = mysqli_query($conn, "SELECT * FROM berita ORDER BY tanggal_publikasi D
     <?php endif; ?>
 </section>
 <?php include __DIR__ . '/partials/footer.php'; ?>
-<script src="assets/js/script.js"></script>
+<script src="assets/js/script.js?v=<?= filemtime(__DIR__ . '/assets/js/script.js') ?>"></script>
 </body>
 </html>

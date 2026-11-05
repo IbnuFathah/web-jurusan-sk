@@ -53,3 +53,4 @@ $telepon_link = preg_replace('/[^0-9+]/', '', $kontak['telepon'] ?? '');
     </div>
     <p class="copy">&copy; 2026 SMKN 1 Kawali - Jurusan SP &amp; SK. All rights reserved.</p>
 </footer>
+<?php include __DIR__ . '/login_modal.php'; ?>

@@ -9,5 +9,5 @@ if ($u) :
     <?php endif; ?>
         <a href="logout.php">Keluar (<?= e($nama_depan) ?>)</a>
 <?php else : ?>
-        <a href="login.php">Login</a>
+        <a href="login.php" class="login-modal-trigger">Login</a>
 <?php endif; ?>

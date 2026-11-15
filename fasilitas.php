@@ -28,7 +28,8 @@ $fasilitas = mysqli_query($conn, "SELECT * FROM fasilitas ORDER BY id ASC");
         <a href="profile.php">Profile</a>
         <a href="berita.php">Berita</a>
         <a href="galeri.php">Galeri</a>
-         <a href="fasilitas.php" class="active">Fasilitas</a>
+        <a href="fasilitas.php" class="active">Fasilitas</a>
+        <a href="#kontak">Kontak</a>
 <?php include __DIR__ . '/partials/nav_auth.php'; ?>
     </nav>
 </header>

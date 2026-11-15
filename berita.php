@@ -28,6 +28,7 @@ $berita = mysqli_query($conn, "SELECT * FROM berita ORDER BY tanggal_publikasi D
         <a href="berita.php" class="active">Berita</a>
         <a href="galeri.php">Galeri</a>
          <a href="fasilitas.php">Fasilitas</a>
+         <a href="#kontak">Kontak</a>
 <?php include __DIR__ . '/partials/nav_auth.php'; ?>
     </nav>
 </header>

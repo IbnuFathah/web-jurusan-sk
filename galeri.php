@@ -27,9 +27,9 @@ $galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC");
         <a href="profile.php">Profile</a>
         <a href="berita.php">Berita</a>
         <a href="galeri.php" class="active">Galeri</a>
-         <a href="fasilitas.php">Fasilitas</a>
+        <a href="fasilitas.php">Fasilitas</a>
+        <a href="#kontak">Kontak</a>
 <?php include __DIR__ . '/partials/nav_auth.php'; ?>
-        <!-- <a href="#kontak">Kontak</a> -->
     </nav>
 </header>
 <h2 class="judul judul-galeri">Galeri Jurusan Seni Karawitan</h2>

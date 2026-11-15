@@ -35,8 +35,8 @@ $guru = mysqli_query($conn, "SELECT nama_guru, jabatan FROM guru ORDER BY id ASC
         <a href="berita.php">Berita</a>
         <a href="galeri.php">Galeri</a>
         <a href="fasilitas.php">Fasilitas</a>
+        <a href="#kontak">Kontak</a>
 <?php include __DIR__ . '/partials/nav_auth.php'; ?>
-        <!-- <a href="#kontak">Kontak</a> -->
     </nav>
 </header>
 <h2 class="judul">Profile Jurusan</h2>

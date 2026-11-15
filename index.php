@@ -6,6 +6,7 @@ require_once __DIR__ . '/auth.php';
 // 3 berita terbaru & 4 foto galeri terbaru untuk ditampilkan di beranda
 $berita = mysqli_query($conn, "SELECT * FROM berita ORDER BY tanggal_publikasi DESC, id DESC LIMIT 3");
 $galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 4");
+$pengaturan = ambil_pengaturan($conn);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -29,9 +30,9 @@ $galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 4");
         <a href="profile.php">Profile</a>
         <a href="berita.php">Berita</a>
         <a href="galeri.php">Galeri</a>
-         <a href="fasilitas.php">Fasilitas</a>
+        <a href="fasilitas.php">Fasilitas</a>
+        <a href="#kontak">Kontak</a>
 <?php include __DIR__ . '/partials/nav_auth.php'; ?>
-        <!-- <a href="#kontak">Kontak</a> -->
     </nav>
 </header>
 <section class="hero">
@@ -50,7 +51,11 @@ $galeri = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 4");
             </div>
             <div class="profile-text">
                 <h3>Sejarah Singkat</h3>
-                <p>Jurusan Seni Pertunjukan (SP) dan Seni Karawitan (SK) di SMKN 1 Kawali berdiri pada tahun 2016 didirikan oleh Pak Tisno. Awalnya 1 kelas berisi 18 siswa, kini berkembang menjadi 6 kelas dengan jumlah 25-30 siswa per kelas.</p>
+                <?php if (trim($pengaturan['sejarah_singkat'] ?? '') !== '') : ?>
+                    <?= paragraf($pengaturan['sejarah_singkat']) ?>
+                <?php else : ?>
+                    <p>Belum ada data sejarah singkat.</p>
+                <?php endif; ?>
                 <a href="profile.php" class="btn-outline">Lihat Profile Lengkap</a>
             </div>
         </div>

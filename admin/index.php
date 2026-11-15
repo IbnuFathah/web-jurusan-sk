@@ -11,9 +11,10 @@ function hitung($conn, $tabel) {
 }
 
 $modul = [
-    ['Berita',    hitung($conn, 'berita'),    'berita/admin_berita.php'],
-    ['Galeri',    hitung($conn, 'galeri'),    'galeri/admin_galeri.php'],
-    ['Fasilitas', hitung($conn, 'fasilitas'), 'fasilitas/index.php'],
+    ['Berita',         hitung($conn, 'berita'),         'berita/admin_berita.php'],
+    ['Galeri',         hitung($conn, 'galeri'),         'galeri/admin_galeri.php'],
+    ['Fasilitas',      hitung($conn, 'fasilitas'),      'fasilitas/index.php'],
+    ['Pengaturan Web', hitung($conn, 'pengaturan_web'), 'pengaturan/index.php'],
 ];
 ?>
 <!DOCTYPE html>

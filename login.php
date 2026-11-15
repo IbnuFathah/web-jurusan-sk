@@ -58,22 +58,24 @@ if (isset($_POST['login'])) {
 </head>
 <body class="auth-page">
     <div class="auth-card">
-        <a href="index.php" class="auth-close" aria-label="Tutup dan kembali ke beranda" title="Kembali ke beranda">&times;</a>
+        <a href="index.php" class="auth-close" aria-label="Tutup dan kembali ke beranda" title="Kembali ke beranda">
+            <svg class="icon-svg" style="width: 16px; height: 16px;" viewBox="0 0 24 24"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+        </a>
         <a href="index.php" class="auth-brand">
             <img src="assets/img/logo.png" alt="Logo SMKN 1 Kawali">
             <div><strong>SMKN 1 KAWALI</strong><small>JURUSAN SP &amp; SK</small></div>
         </a>
-        <h2>Login</h2>
+        <h2>Masuk ke Akun</h2>
         <?php if ($error) : ?><p class="auth-error"><?= e($error) ?></p><?php endif; ?>
         <?php if (isset($_GET['daftar'])) : ?><p class="auth-ok">Pendaftaran berhasil, silakan login.</p><?php endif; ?>
         <form method="POST" action="">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" value="<?= e($email) ?>" required autofocus>
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required>
-            <button type="submit" name="login">Masuk</button>
+            <label for="email">Alamat Email</label>
+            <input type="email" id="email" name="email" value="<?= e($email) ?>" placeholder="nama@email.com" required autofocus>
+            <label for="password">Kata Sandi</label>
+            <input type="password" id="password" name="password" placeholder="••••••••" required>
+            <button type="submit" name="login">Masuk Sekarang</button>
         </form>
-        <p class="auth-foot">Belum punya akun? <a href="register.php">Daftar</a></p>
+        <p class="auth-foot">Belum punya akun? <a href="register.php">Daftar Akun Baru</a></p>
     </div>
 </body>
 </html>

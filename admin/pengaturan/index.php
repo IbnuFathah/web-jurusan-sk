@@ -89,16 +89,16 @@ include __DIR__ . '/../sidebar.php';
     <?php if ($data) : ?>
         <div class="action-bar">
             <a href="edit.php?id=<?= (int) $data['id'] ?>" class="btn btn-warning">
-                ✏️ Edit Pengaturan
+                Edit Pengaturan
             </a>
             <a href="../../profile.php" target="_blank" class="btn btn-outline" title="Lihat di Halaman Profile Publik">
-                ↗️ Lihat Halaman Profile
+                Lihat Halaman Profile
             </a>
             <a href="../../index.php#kontak" target="_blank" class="btn btn-outline" title="Lihat Footer Kontak Publik">
-                ↗️ Lihat Footer Kontak
+                Lihat Footer Kontak
             </a>
             <a href="hapus.php?id=<?= (int) $data['id'] ?>" class="btn btn-danger" onclick="return confirm('Peringatan: Yakin ingin mereset/menghapus data pengaturan web ini? Halaman profil dan kontak akan kosong!')">
-                🗑️ Reset / Hapus
+                Reset / Hapus
             </a>
         </div>
 
@@ -107,7 +107,7 @@ include __DIR__ . '/../sidebar.php';
             <section class="card">
                 <div class="card-header">
                     <div class="card-title">
-                        <span>🏛️</span> Profil Jurusan — Sejarah Singkat (First Look)
+                        Profil Jurusan — Sejarah Singkat (First Look)
                     </div>
                     <span class="card-badge">Tampil di: Halaman Profile &amp; Preview Beranda</span>
                 </div>
@@ -124,7 +124,7 @@ include __DIR__ . '/../sidebar.php';
             <section class="card">
                 <div class="card-header">
                     <div class="card-title">
-                        <span>📞</span> Informasi Kontak Kami
+                        Informasi Kontak Kami
                     </div>
                     <span class="card-badge">Tampil di: Footer Website ("Hubungi Kami")</span>
                 </div>
@@ -134,7 +134,7 @@ include __DIR__ . '/../sidebar.php';
                         <div class="info-val">
                             <?php if (!empty($data['alamat'])) : ?>
                                 <a href="https://www.google.com/maps/search/?api=1&amp;query=<?= urlencode($data['alamat']) ?>" target="_blank" rel="noopener">
-                                    📍 <?= e($data['alamat']) ?>
+                                    <?= e($data['alamat']) ?>
                                 </a>
                             <?php else : ?>
                                 <span style="color: #999;">Belum diisi</span>
@@ -146,7 +146,7 @@ include __DIR__ . '/../sidebar.php';
                         <div class="info-val">
                             <?php if (!empty($data['email_sekolah'])) : ?>
                                 <a href="mailto:<?= e($data['email_sekolah']) ?>">
-                                    ✉️ <?= e($data['email_sekolah']) ?>
+                                    <?= e($data['email_sekolah']) ?>
                                 </a>
                             <?php else : ?>
                                 <span style="color: #999;">Belum diisi</span>
@@ -159,7 +159,7 @@ include __DIR__ . '/../sidebar.php';
                             <?php if (!empty($data['telepon'])) : ?>
                                 <?php $tel_link = preg_replace('/[^0-9+]/', '', $data['telepon']); ?>
                                 <a href="tel:<?= e($tel_link) ?>">
-                                    📞 <?= e($data['telepon']) ?>
+                                    <?= e($data['telepon']) ?>
                                 </a>
                             <?php else : ?>
                                 <span style="color: #999;">Belum diisi</span>
@@ -173,7 +173,7 @@ include __DIR__ . '/../sidebar.php';
             <section class="card">
                 <div class="card-header">
                     <div class="card-title">
-                        <span>🌐</span> Tautan Media Sosial
+                        Tautan Media Sosial
                     </div>
                     <span class="card-badge">Tampil di: Ikon Footer ("Sosial Media")</span>
                 </div>

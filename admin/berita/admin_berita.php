@@ -55,7 +55,7 @@ include __DIR__ . '/../sidebar.php';
                     <img src="../../assets/img/berita/<?= htmlspecialchars($row['gambar']); ?>" alt="<?= htmlspecialchars($row['judul']); ?>">
                     <div class="card-body">
                         <h3><?= htmlspecialchars($row['judul']); ?></h3>
-                        <small>📌 <?= htmlspecialchars($row['tanggal_publikasi']); ?></small>
+                        <small><?= htmlspecialchars($row['tanggal_publikasi']); ?></small>
                         <p><?= htmlspecialchars($row['ringkasan']); ?></p>
                     </div>
                 </div>

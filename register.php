@@ -53,24 +53,27 @@ if (isset($_POST['daftar'])) {
 </head>
 <body class="auth-page">
     <div class="auth-card">
+        <a href="index.php" class="auth-close" aria-label="Tutup dan kembali ke beranda" title="Kembali ke beranda">
+            <svg class="icon-svg" style="width: 16px; height: 16px;" viewBox="0 0 24 24"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+        </a>
         <a href="index.php" class="auth-brand">
             <img src="assets/img/logo.png" alt="Logo SMKN 1 Kawali">
             <div><strong>SMKN 1 KAWALI</strong><small>JURUSAN SP &amp; SK</small></div>
         </a>
-        <h2>Daftar Akun</h2>
+        <h2>Daftar Akun Baru</h2>
         <?php if ($error) : ?><p class="auth-error"><?= e($error) ?></p><?php endif; ?>
         <form method="POST" action="">
             <label for="nama_lengkap">Nama Lengkap</label>
-            <input type="text" id="nama_lengkap" name="nama_lengkap" value="<?= e($nama) ?>" required autofocus>
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" value="<?= e($email) ?>" required>
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" minlength="6" required>
-            <label for="ulangi_password">Ulangi Password</label>
-            <input type="password" id="ulangi_password" name="ulangi_password" minlength="6" required>
-            <button type="submit" name="daftar">Daftar</button>
+            <input type="text" id="nama_lengkap" name="nama_lengkap" value="<?= e($nama) ?>" placeholder="Nama lengkap Anda" required autofocus>
+            <label for="email">Alamat Email</label>
+            <input type="email" id="email" name="email" value="<?= e($email) ?>" placeholder="nama@email.com" required>
+            <label for="password">Kata Sandi</label>
+            <input type="password" id="password" name="password" minlength="6" placeholder="Minimal 6 karakter" required>
+            <label for="ulangi_password">Konfirmasi Kata Sandi</label>
+            <input type="password" id="ulangi_password" name="ulangi_password" minlength="6" placeholder="Ulangi kata sandi" required>
+            <button type="submit" name="daftar">Daftar Sekarang</button>
         </form>
-        <p class="auth-foot">Sudah punya akun? <a href="login.php">Login</a> &middot; <a href="index.php">Kembali ke beranda</a></p>
+        <p class="auth-foot">Sudah punya akun? <a href="login.php">Masuk di sini</a> &middot; <a href="index.php">Kembali ke beranda</a></p>
     </div>
 </body>
 </html>

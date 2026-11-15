@@ -138,7 +138,7 @@ include __DIR__ . '/../sidebar.php';
             <!-- 1. Bagian Profil Jurusan (First Look) -->
             <div class="section-box">
                 <div class="section-title">
-                    <span>🏛️</span> Bagian Profil Jurusan — First Look
+                    Bagian Profil Jurusan — First Look
                 </div>
                 <div class="section-desc">
                     Teks ini adalah sejarah singkat atau deskripsi pembuka jurusan. Tampil di halaman <strong>Profile</strong> dan section profil di <strong>Beranda</strong>.
@@ -154,7 +154,7 @@ include __DIR__ . '/../sidebar.php';
             <!-- 2. Bagian Kontak Sekolah -->
             <div class="section-box">
                 <div class="section-title">
-                    <span>📞</span> Informasi Kontak Kami
+                    Informasi Kontak Kami
                 </div>
                 <div class="section-desc">
                     Informasi ini tampil pada footer seluruh halaman website (kolom "Hubungi Kami").
@@ -182,7 +182,7 @@ include __DIR__ . '/../sidebar.php';
             <!-- 3. Bagian Tautan Media Sosial -->
             <div class="section-box">
                 <div class="section-title">
-                    <span>🌐</span> Tautan Media Sosial (Footer)
+                    Tautan Media Sosial (Footer)
                 </div>
                 <div class="section-desc">
                     Ikon sosial media di footer hanya akan muncul jika tautan diisi (kosongkan jika tidak ada akun).
@@ -214,7 +214,7 @@ include __DIR__ . '/../sidebar.php';
             </div>
 
             <div class="btn-group">
-                <button type="submit" class="btn-submit">💾 Simpan Perubahan</button>
+                <button type="submit" class="btn-submit">Simpan Perubahan</button>
                 <a href="index.php" class="btn-kembali">Kembali</a>
             </div>
         </form>

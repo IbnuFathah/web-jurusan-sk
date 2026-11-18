@@ -73,9 +73,15 @@ $aktif = $aktif ?? '';
           <span>Pengaturan Web</span>
         </a>
       </li>
+      <li>
+        <a class="sidebar__link" href="<?= $root ?>logout.php" data-tooltip="Keluar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>
+          <span>Keluar</span>
+        </a>
+      </li>
     </ul>
 
-    <p class="sidebar__label sidebar__label--spaced">SETTINGS</p>
+    <!-- <p class="sidebar__label sidebar__label--spaced">SETTINGS</p>
     <ul class="sidebar__menu">
       <li>
         <a class="sidebar__link" href="#" data-tooltip="Notification">
@@ -95,11 +101,11 @@ $aktif = $aktif ?? '';
           <span>Keluar</span>
         </a>
       </li>
-    </ul>
+    </ul> -->
 
   </nav>
 
-  <!-- Footer: Light / Dark Toggle -->
+  <!-- Footer: Light / Dark Toggle
   <div class="sidebar__footer">
     <button class="sidebar__theme" type="button" id="btnThemeLight" title="Mode Terang">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
@@ -109,7 +115,7 @@ $aktif = $aktif ?? '';
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
       <span>Dark</span>
     </button>
-  </div>
+  </div> -->
 
 </aside>
 
@@ -160,3 +166,4 @@ $aktif = $aktif ?? '';
   }
 })();
 </script>
+<script src="<?= $root ?>assets/js/admin.js"></script>

@@ -59,243 +59,163 @@ document.addEventListener('DOMContentLoaded', () => {
   const nextBtn = document.getElementById('teacherSliderNext');
   const dotsContainer = document.getElementById('teacherSliderDots');
 
-  if (track) {
-    const cards = track.querySelectorAll('.teacher-card');
-    const dots = dotsContainer ? dotsContainer.querySelectorAll('.slider-dot') : [];
+  if (track && prevBtn && nextBtn) {
+    const cards = Array.from(track.querySelectorAll('.teacher-card'));
+    const dots = dotsContainer ? Array.from(dotsContainer.querySelectorAll('.slider-dot')) : [];
+    let currentIdx = 0;
 
-    const updateControls = () => {
-      const scrollLeft = track.scrollLeft;
-      const maxScroll = track.scrollWidth - track.clientWidth;
-      
-      if (prevBtn) prevBtn.disabled = scrollLeft <= 4;
-      if (nextBtn) nextBtn.disabled = scrollLeft >= maxScroll - 4;
-
-      // Update active dot
-      if (cards.length > 0 && dots.length > 0) {
-        const cardWidth = cards[0].offsetWidth + 20; // 20px gap
-        const activeIdx = Math.round(scrollLeft / cardWidth);
-        dots.forEach((dot, idx) => {
-          dot.classList.toggle('active', idx === activeIdx);
-        });
-      }
-    };
-
-    if (prevBtn && nextBtn) {
-      prevBtn.addEventListener('click', () => {
-        const cardWidth = cards[0] ? cards[0].offsetWidth + 20 : 260;
-        track.scrollBy({ left: -cardWidth, behavior: 'smooth' });
-      });
-
-      nextBtn.addEventListener('click', () => {
-        const cardWidth = cards[0] ? cards[0].offsetWidth + 20 : 260;
-        track.scrollBy({ left: cardWidth, behavior: 'smooth' });
-      });
-
-      track.addEventListener('scroll', updateControls, { passive: true });
-      window.addEventListener('resize', updateControls);
-      updateControls();
+    function goToSlide(idx) {
+      if (!cards.length) return;
+      currentIdx = Math.max(0, Math.min(idx, cards.length - 1));
+      const cardWidth = cards[0].offsetWidth + parseInt(getComputedStyle(track).gap || '0');
+      track.style.transform = `translateX(-${currentIdx * cardWidth}px)`;
+      dots.forEach((d, i) => d.classList.toggle('active', i === currentIdx));
     }
 
-    if (dots.length > 0) {
-      dots.forEach((dot) => {
-        dot.addEventListener('click', () => {
-          const idx = parseInt(dot.getAttribute('data-index') || '0', 10);
-          const cardWidth = cards[0] ? cards[0].offsetWidth + 20 : 260;
-          track.scrollTo({ left: idx * cardWidth, behavior: 'smooth' });
-        });
-      });
-    }
+    prevBtn.addEventListener('click', () => goToSlide(currentIdx - 1));
+    nextBtn.addEventListener('click', () => goToSlide(currentIdx + 1));
+    dots.forEach((d, i) => d.addEventListener('click', () => goToSlide(i)));
+
+    // Auto-resize on window resize
+    window.addEventListener('resize', () => goToSlide(currentIdx));
   }
 
   /* ----------------------------------------------------
-   * 4. Full Teacher Directory Modal & Filter
+   * 4. Full Teacher Directory Modal
    * ---------------------------------------------------- */
-  const openDirectoryBtn = document.getElementById('btnOpenTeacherDirectory');
-  const directoryModal = document.getElementById('teacherDirectoryModal');
-  const closeDirectoryBtn = document.getElementById('btnCloseTeacherDirectory');
+  const btnOpenDir  = document.getElementById('btnOpenTeacherDirectory');
+  const dirModal    = document.getElementById('teacherDirectoryModal');
+  const btnCloseDir = document.getElementById('btnCloseTeacherDirectory');
+
+  if (btnOpenDir && dirModal) {
+    const openDir = () => {
+      dirModal.setAttribute('aria-hidden', 'false');
+      dirModal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    };
+    const closeDir = () => {
+      dirModal.setAttribute('aria-hidden', 'true');
+      dirModal.classList.remove('open');
+      document.body.style.overflow = '';
+    };
+
+    btnOpenDir.addEventListener('click', openDir);
+    if (btnCloseDir) btnCloseDir.addEventListener('click', closeDir);
+    dirModal.addEventListener('click', (e) => { if (e.target === dirModal) closeDir(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDir(); });
+  }
+
+  /* ----------------------------------------------------
+   * 5. Teacher Search & Filter (inside Directory Modal)
+   * ---------------------------------------------------- */
   const searchInput = document.getElementById('teacherSearchInput');
+  const dirGrid     = document.getElementById('teacherDirectoryGrid');
+  const dirEmpty    = document.getElementById('teacherDirectoryEmpty');
   const filterChips = document.querySelectorAll('.filter-chip');
-  const directoryGrid = document.getElementById('teacherDirectoryGrid');
-  const directoryEmpty = document.getElementById('teacherDirectoryEmpty');
 
-  const openDirectory = () => {
-    if (!directoryModal) return;
-    directoryModal.classList.add('is-active');
-    directoryModal.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-    if (searchInput) {
-      searchInput.value = '';
-      setTimeout(() => searchInput.focus(), 100);
-    }
-    filterTeachers();
-  };
+  let activeFilter = 'all';
 
-  const closeDirectory = () => {
-    if (!directoryModal) return;
-    directoryModal.classList.remove('is-active');
-    directoryModal.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-  };
-
-  if (openDirectoryBtn && directoryModal) {
-    openDirectoryBtn.addEventListener('click', openDirectory);
-  }
-
-  if (closeDirectoryBtn && directoryModal) {
-    closeDirectoryBtn.addEventListener('click', closeDirectory);
-  }
-
-  if (directoryModal) {
-    directoryModal.addEventListener('click', (e) => {
-      if (e.target === directoryModal) closeDirectory();
-    });
-  }
-
-  // Filter & Search Logic
   function filterTeachers() {
-    if (!directoryGrid) return;
-    const cards = directoryGrid.querySelectorAll('.teacher-card');
-    const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
-    const activeChip = document.querySelector('.filter-chip.active');
-    const filterType = activeChip ? activeChip.getAttribute('data-filter') : 'all';
-
-    let matchCount = 0;
+    if (!dirGrid) return;
+    const q = searchInput ? searchInput.value.toLowerCase() : '';
+    const cards = dirGrid.querySelectorAll('.teacher-card');
+    let visible = 0;
 
     cards.forEach(card => {
-      const name = (card.getAttribute('data-teacher-name') || '').toLowerCase();
-      const role = (card.getAttribute('data-teacher-role') || '').toLowerCase();
+      const name = (card.dataset.teacherName || '').toLowerCase();
+      const role = (card.dataset.teacherRole || '').toLowerCase();
+      const matchSearch = q === '' || name.includes(q) || role.includes(q);
+      const matchFilter =
+        activeFilter === 'all' ||
+        (activeFilter === 'wali'    && role.includes('wali')) ||
+        (activeFilter === 'pengajar' && role.includes('pengajar')) ||
+        (activeFilter === 'ketua'   && role.includes('ketua'));
 
-      // Check search match
-      const matchesSearch = query === '' || name.includes(query) || role.includes(query);
-
-      // Check category match
-      let matchesCategory = true;
-      if (filterType === 'wali') {
-        matchesCategory = role.includes('wali');
-      } else if (filterType === 'pengajar') {
-        matchesCategory = role.includes('pengajar');
-      } else if (filterType === 'ketua') {
-        matchesCategory = role.includes('ketua');
-      }
-
-      const isVisible = matchesSearch && matchesCategory;
-      card.style.display = isVisible ? '' : 'none';
-      if (isVisible) matchCount++;
+      const show = matchSearch && matchFilter;
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
     });
 
-    if (directoryEmpty) {
-      directoryEmpty.style.display = matchCount === 0 ? 'block' : 'none';
-    }
+    if (dirEmpty) dirEmpty.style.display = visible === 0 ? 'flex' : 'none';
   }
 
-  if (searchInput) {
-    searchInput.addEventListener('input', filterTeachers);
-  }
+  if (searchInput) searchInput.addEventListener('input', filterTeachers);
 
-  if (filterChips.length > 0) {
-    filterChips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        filterChips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        filterTeachers();
-      });
+  filterChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      filterChips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeFilter = chip.dataset.filter || 'all';
+      filterTeachers();
     });
-  }
+  });
 
   /* ----------------------------------------------------
-   * 5. Teacher Detail Modal
+   * 6. Teacher Detail Modal
    * ---------------------------------------------------- */
-  const teacherDetailModal = document.getElementById('teacherDetailModal');
-  const closeTeacherDetailBtn = document.getElementById('btnCloseTeacherDetail');
-  const modalTeacherName = document.getElementById('modalTeacherName');
-  const modalTeacherRole = document.getElementById('modalTeacherRole');
+  const detailModal    = document.getElementById('teacherDetailModal');
+  const modalName      = document.getElementById('modalTeacherName');
+  const modalRole      = document.getElementById('modalTeacherRole');
+  const btnCloseDetail = document.getElementById('btnCloseTeacherDetail');
 
-  const openTeacherDetail = (name, role) => {
-    if (!teacherDetailModal) return;
-    if (modalTeacherName) modalTeacherName.textContent = name;
-    if (modalTeacherRole) modalTeacherRole.textContent = role;
-    teacherDetailModal.classList.add('is-active');
-    teacherDetailModal.setAttribute('aria-hidden', 'false');
-  };
+  function openDetailModal(name, role) {
+    if (!detailModal) return;
+    if (modalName) modalName.textContent = name;
+    if (modalRole) modalRole.textContent = role;
+    detailModal.setAttribute('aria-hidden', 'false');
+    detailModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
 
-  const closeTeacherDetail = () => {
-    if (!teacherDetailModal) return;
-    teacherDetailModal.classList.remove('is-active');
-    teacherDetailModal.setAttribute('aria-hidden', 'true');
-  };
+  function closeDetailModal() {
+    if (!detailModal) return;
+    detailModal.setAttribute('aria-hidden', 'true');
+    detailModal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
 
-  // Bind to all "Lihat Profil" buttons on cards
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('.btn-view-teacher');
-    if (btn) {
-      e.preventDefault();
-      const name = btn.getAttribute('data-name') || '';
-      const role = btn.getAttribute('data-role') || '';
-      openTeacherDetail(name, role);
-    }
+    if (btn) openDetailModal(btn.dataset.name || '-', btn.dataset.role || '-');
   });
 
-  if (closeTeacherDetailBtn && teacherDetailModal) {
-    closeTeacherDetailBtn.addEventListener('click', closeTeacherDetail);
+  if (btnCloseDetail) btnCloseDetail.addEventListener('click', closeDetailModal);
+  if (detailModal) {
+    detailModal.addEventListener('click', (e) => { if (e.target === detailModal) closeDetailModal(); });
   }
-
-  if (teacherDetailModal) {
-    teacherDetailModal.addEventListener('click', (e) => {
-      if (e.target === teacherDetailModal) closeTeacherDetail();
-    });
-  }
-
-  // Global ESC key handler for modals
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      if (teacherDetailModal && teacherDetailModal.classList.contains('is-active')) {
-        closeTeacherDetail();
-      } else if (directoryModal && directoryModal.classList.contains('is-active')) {
-        closeDirectory();
-      }
-    }
-  });
 
   /* ----------------------------------------------------
-   * 6. Login Modal Handler
+   * 7. Login Modal (if present)
    * ---------------------------------------------------- */
-  const loginOverlay = document.getElementById('loginOverlay');
-  if (loginOverlay) {
-    const loginModal = loginOverlay.querySelector('.login-modal');
-    const closeLogin = loginOverlay.querySelector('.login-modal-close');
-    const loginForm = loginOverlay.querySelector('.login-modal-form');
-    const loginError = loginOverlay.querySelector('.login-modal-error');
-    let previousFocus = null;
+  const loginModalOverlay = document.getElementById('loginModalOverlay');
+  const loginModalCard    = document.getElementById('loginModalCard');
+  const loginError        = document.getElementById('loginError');
+  const loginForm         = document.getElementById('loginForm');
 
-    const openLogin = event => {
-      event.preventDefault();
-      previousFocus = menu && menu.classList.contains('open') ? menuBtn : document.activeElement;
-      if (menu) menu.classList.remove('open');
-      loginOverlay.classList.add('is-open');
-      loginOverlay.setAttribute('aria-hidden', 'false');
-      document.body.classList.add('login-modal-open');
-      if (loginError) loginError.hidden = true;
-      const emailInput = loginModal.querySelector('input[type="email"]');
-      if (emailInput) emailInput.focus();
+  if (loginModalOverlay) {
+    const openModal = () => {
+      loginModalOverlay.style.opacity  = '0';
+      loginModalOverlay.style.display  = 'flex';
+      requestAnimationFrame(() => { loginModalOverlay.style.opacity = '1'; });
+      document.body.style.overflow = 'hidden';
     };
 
-    const dismissLogin = () => {
-      loginOverlay.classList.remove('is-open');
-      loginOverlay.setAttribute('aria-hidden', 'true');
-      document.body.classList.remove('login-modal-open');
-      if (previousFocus) previousFocus.focus();
+    const closeModal = () => {
+      loginModalOverlay.style.opacity = '0';
+      setTimeout(() => { loginModalOverlay.style.display = 'none'; }, 250);
+      document.body.style.overflow = '';
     };
 
-    document.querySelectorAll('.login-modal-trigger').forEach(link => {
-      link.addEventListener('click', openLogin);
+    document.querySelectorAll('.login-modal-trigger').forEach(el => {
+      el.addEventListener('click', (e) => { e.preventDefault(); openModal(); });
     });
 
-    if (closeLogin) closeLogin.addEventListener('click', dismissLogin);
-    loginOverlay.addEventListener('click', event => {
-      if (event.target === loginOverlay) dismissLogin();
+    loginModalOverlay.addEventListener('click', (e) => {
+      if (loginModalCard && !loginModalCard.contains(e.target)) closeModal();
     });
-    document.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && loginOverlay.classList.contains('is-open')) dismissLogin();
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && loginModalOverlay.style.display === 'flex') closeModal();
     });
 
     if (loginForm) {
@@ -337,3 +257,206 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 });
+
+/* ============================================================
+ * LOGOUT CONFIRMATION MODAL — Semua halaman (publik & admin)
+ * Intercept semua link yang menuju logout.php
+ * ============================================================ */
+(function () {
+  const modalHTML = `
+    <div id="logoutConfirmModal" style="
+      position:fixed;inset:0;z-index:99999;
+      background:rgba(0,0,0,0.52);
+      display:flex;align-items:center;justify-content:center;
+      opacity:0;pointer-events:none;
+      transition:opacity 0.22s ease;
+      backdrop-filter:blur(4px);
+    ">
+      <div id="logoutConfirmBox" style="
+        background:#ffffff;border-radius:20px;
+        padding:36px 32px 28px;
+        width:min(380px,90vw);text-align:center;
+        box-shadow:0 28px 70px -12px rgba(0,0,0,0.30);
+        transform:scale(0.92);
+        transition:transform 0.22s cubic-bezier(0.16,1,0.3,1);
+      ">
+        <div style="
+          width:60px;height:60px;border-radius:50%;
+          background:rgba(184,160,90,0.12);
+          border:1.5px solid rgba(184,160,90,0.3);
+          display:flex;align-items:center;justify-content:center;
+          margin:0 auto 20px;
+        ">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
+               stroke="#b8a05a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </div>
+        <h3 style="font-size:19px;font-weight:800;color:#1a1a1a;margin-bottom:8px;">Konfirmasi Keluar</h3>
+        <p style="font-size:14px;color:#666;line-height:1.65;margin-bottom:28px;">
+          Apakah Anda yakin ingin mengakhiri sesi dan keluar dari akun ini?
+        </p>
+        <div style="display:flex;gap:12px;">
+          <button id="logoutCancelBtn" style="
+            flex:1;padding:12px;border-radius:11px;
+            border:1.5px solid #e2e8f0;background:#f8fafc;
+            font-size:14px;font-weight:600;color:#555;cursor:pointer;
+            transition:background 0.15s;font-family:inherit;
+          ">Batal</button>
+          <a id="logoutConfirmBtn" href="#" style="
+            flex:1;padding:12px;border-radius:11px;
+            background:#b8a05a;color:#fff;
+            font-size:14px;font-weight:700;text-decoration:none;
+            display:flex;align-items:center;justify-content:center;gap:8px;
+            transition:background 0.15s;
+          ">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            Ya, Keluar
+          </a>
+        </div>
+      </div>
+    </div>`;
+
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+  const overlay    = document.getElementById('logoutConfirmModal');
+  const box        = document.getElementById('logoutConfirmBox');
+  const cancelBtn  = document.getElementById('logoutCancelBtn');
+  const confirmBtn = document.getElementById('logoutConfirmBtn');
+
+  function openLogoutModal(href) {
+    confirmBtn.href = href;
+    overlay.style.pointerEvents = 'all';
+    overlay.style.opacity = '1';
+    box.style.transform = 'scale(1)';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLogoutModal() {
+    overlay.style.opacity = '0';
+    overlay.style.pointerEvents = 'none';
+    box.style.transform = 'scale(0.92)';
+    document.body.style.overflow = '';
+  }
+
+  // Intercept semua link logout di seluruh halaman
+  document.addEventListener('click', function (e) {
+    const link = e.target.closest('a[href]');
+    if (!link) return;
+    const href = link.getAttribute('href') || '';
+    if (href.includes('logout.php') || href.endsWith('/logout')) {
+      e.preventDefault();
+      openLogoutModal(link.href);
+    }
+  });
+
+  cancelBtn.addEventListener('click', closeLogoutModal);
+  overlay.addEventListener('click', function (e) {
+    if (e.target === overlay) closeLogoutModal();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeLogoutModal();
+  });
+})();
+
+/* ============================================================
+ * SKELETON LOADING SCREEN — Semua halaman (muncul setelah 2s)
+ * ============================================================ */
+(function () {
+  // Inject CSS
+  const css = document.createElement('style');
+  css.textContent = `
+    #skeletonScreen {
+      position: fixed;
+      inset: 0;
+      z-index: 98000;
+      background: #f8f9fa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    #skeletonScreen.sk-visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .sk-logo-circle {
+      width: 56px; height: 56px; border-radius: 50%;
+    }
+    .sk-bar { border-radius: 7px; }
+    .sk-logo-circle, .sk-bar {
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 300% 100%;
+      animation: skShine 1.5s ease-in-out infinite;
+    }
+    @keyframes skShine {
+      0%   { background-position: 100% 0; }
+      100% { background-position: -100% 0; }
+    }
+    .sk-brand-wrap {
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .sk-content-wrap {
+      display: flex; flex-direction: column; gap: 10px;
+      width: min(460px, 78vw);
+    }
+    .sk-footer-label {
+      font-size: 12.5px;
+      color: #b0bec5;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      margin-top: 4px;
+    }
+  `;
+  document.head.appendChild(css);
+
+  // Inject HTML
+  const skHTML = `
+    <div id="skeletonScreen">
+      <div class="sk-brand-wrap">
+        <div class="sk-logo-circle"></div>
+        <div class="sk-bar" style="width:150px;height:13px;"></div>
+        <div class="sk-bar" style="width:100px;height:10px;opacity:.55;"></div>
+      </div>
+      <div class="sk-content-wrap">
+        <div class="sk-bar" style="height:14px;width:100%;"></div>
+        <div class="sk-bar" style="height:14px;width:88%;"></div>
+        <div class="sk-bar" style="height:14px;width:72%;"></div>
+        <div class="sk-bar" style="height:14px;width:55%;opacity:.6;"></div>
+      </div>
+      <div class="sk-footer-label">Memuat halaman, harap tunggu...</div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend', skHTML);
+
+  const skEl = document.getElementById('skeletonScreen');
+  let skTimer = null;
+
+  // Hanya tampilkan jika loading > 2 detik
+  if (document.readyState !== 'complete') {
+    skTimer = setTimeout(function () {
+      if (document.readyState !== 'complete') {
+        skEl.classList.add('sk-visible');
+      }
+    }, 2000);
+  }
+
+  window.addEventListener('load', function () {
+    clearTimeout(skTimer);
+    skEl.style.opacity = '0';
+    skEl.style.pointerEvents = 'none';
+    setTimeout(function () {
+      if (skEl && skEl.parentNode) skEl.remove();
+    }, 400);
+  });
+})();

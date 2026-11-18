@@ -57,7 +57,7 @@ $pengaturan = ambil_pengaturan($conn);
     </div>
 </section>
 
-<main class="container" style="display: flex; flex-direction: column; gap: 48px; padding-bottom: 80px;">
+<main class="container" style="display: flex; flex-direction: column; gap: 48px; padding-top: 56px; padding-bottom: 80px;">
 
     <!-- SECTION PROFIL JURUSAN (BENTO CARD FIRST LOOK) -->
     <section class="bento-card">

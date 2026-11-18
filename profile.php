@@ -62,7 +62,7 @@ $guru_preview = array_slice($semua_guru, 0, 4);
     </div>
 </header>
 
-<main class="container" style="padding-bottom: 80px;">
+<main class="container" style="padding-bottom: 80px; padding-top: 48px; display: flex; flex-direction: column; gap: 48px;">
 
     <!-- 1. BENTO CARD: SEJARAH SINGKAT (FIRST LOOK) -->
     <section class="bento-card">

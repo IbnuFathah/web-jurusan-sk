@@ -61,23 +61,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (track && prevBtn && nextBtn) {
     const cards = Array.from(track.querySelectorAll('.teacher-card'));
-    const dots = dotsContainer ? Array.from(dotsContainer.querySelectorAll('.slider-dot')) : [];
+    let dots = dotsContainer ? Array.from(dotsContainer.querySelectorAll('.slider-dot')) : [];
     let currentIdx = 0;
 
-    function goToSlide(idx) {
+    function getVisibleCount() {
+      if (!cards.length) return 4;
+      const containerWidth = track.parentElement.offsetWidth;
+      const gap = parseFloat(getComputedStyle(track).gap) || 20;
+      const cardWidth = cards[0].offsetWidth;
+      return Math.max(1, Math.round((containerWidth + gap) / (cardWidth + gap)));
+    }
+
+    function updateSlider() {
       if (!cards.length) return;
-      currentIdx = Math.max(0, Math.min(idx, cards.length - 1));
-      const cardWidth = cards[0].offsetWidth + parseInt(getComputedStyle(track).gap || '0');
-      track.style.transform = `translateX(-${currentIdx * cardWidth}px)`;
+      const visibleCount = getVisibleCount();
+      const maxIdx = Math.max(0, cards.length - visibleCount);
+      const isSlideable = cards.length > visibleCount;
+
+      prevBtn.style.display = isSlideable ? 'inline-flex' : 'none';
+      nextBtn.style.display = isSlideable ? 'inline-flex' : 'none';
+      if (dotsContainer) {
+        dotsContainer.style.display = isSlideable ? 'flex' : 'none';
+      }
+
+      if (dotsContainer && isSlideable) {
+        const neededDots = maxIdx + 1;
+        if (dots.length !== neededDots) {
+          dotsContainer.innerHTML = '';
+          for (let i = 0; i < neededDots; i++) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'slider-dot';
+            btn.setAttribute('aria-label', `Slide ${i + 1}`);
+            btn.addEventListener('click', () => goToSlide(i));
+            dotsContainer.appendChild(btn);
+          }
+          dots = Array.from(dotsContainer.querySelectorAll('.slider-dot'));
+        }
+      }
+
+      currentIdx = Math.max(0, Math.min(currentIdx, maxIdx));
+
+      const gap = parseFloat(getComputedStyle(track).gap) || 20;
+      const stepWidth = cards[0].offsetWidth + gap;
+      track.style.transform = `translateX(-${currentIdx * stepWidth}px)`;
+
+      prevBtn.disabled = currentIdx === 0;
+      nextBtn.disabled = currentIdx >= maxIdx;
+
       dots.forEach((d, i) => d.classList.toggle('active', i === currentIdx));
+    }
+
+    function goToSlide(idx) {
+      currentIdx = idx;
+      updateSlider();
     }
 
     prevBtn.addEventListener('click', () => goToSlide(currentIdx - 1));
     nextBtn.addEventListener('click', () => goToSlide(currentIdx + 1));
-    dots.forEach((d, i) => d.addEventListener('click', () => goToSlide(i)));
 
-    // Auto-resize on window resize
-    window.addEventListener('resize', () => goToSlide(currentIdx));
+    updateSlider();
+    window.addEventListener('resize', updateSlider);
   }
 
   /* ----------------------------------------------------
@@ -90,19 +134,19 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnOpenDir && dirModal) {
     const openDir = () => {
       dirModal.setAttribute('aria-hidden', 'false');
-      dirModal.classList.add('open');
+      dirModal.classList.add('is-active');
       document.body.style.overflow = 'hidden';
     };
     const closeDir = () => {
       dirModal.setAttribute('aria-hidden', 'true');
-      dirModal.classList.remove('open');
+      dirModal.classList.remove('is-active');
       document.body.style.overflow = '';
     };
 
     btnOpenDir.addEventListener('click', openDir);
     if (btnCloseDir) btnCloseDir.addEventListener('click', closeDir);
     dirModal.addEventListener('click', (e) => { if (e.target === dirModal) closeDir(); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDir(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && dirModal.classList.contains('is-active')) closeDir(); });
   }
 
   /* ----------------------------------------------------
@@ -163,15 +207,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (modalName) modalName.textContent = name;
     if (modalRole) modalRole.textContent = role;
     detailModal.setAttribute('aria-hidden', 'false');
-    detailModal.classList.add('open');
+    detailModal.classList.add('is-active');
     document.body.style.overflow = 'hidden';
   }
 
   function closeDetailModal() {
     if (!detailModal) return;
     detailModal.setAttribute('aria-hidden', 'true');
-    detailModal.classList.remove('open');
-    document.body.style.overflow = '';
+    detailModal.classList.remove('is-active');
+    if (!dirModal || !dirModal.classList.contains('is-active')) {
+      document.body.style.overflow = '';
+    }
   }
 
   document.addEventListener('click', (e) => {
@@ -183,6 +229,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (detailModal) {
     detailModal.addEventListener('click', (e) => { if (e.target === detailModal) closeDetailModal(); });
   }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && detailModal && detailModal.classList.contains('is-active')) closeDetailModal();
+  });
 
   /* ----------------------------------------------------
    * 7. Login Modal (if present)

@@ -1,7 +1,32 @@
 <?php
-// partials/footer.php — Footer "Kontak Kami" Editorial Minimalist
+// partials/footer.php — Footer "Kontak Kami" Editorial Minimalist + Visitor Tracker
+
+// Catat statistik pengunjung harian (hanya saat halaman publik dibuka)
+if (isset($conn) && $conn) {
+    $tgl_hari_ini  = date('Y-m-d');
+    $ip_pengunjung = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+    $ua_pengunjung = substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 250);
+
+    $stmt_visit = @mysqli_prepare(
+        $conn,
+        "INSERT INTO statistik_pengunjung (tanggal, ip_address, user_agent, hits)
+         VALUES (?, ?, ?, 1)
+         ON DUPLICATE KEY UPDATE hits = hits + 1, user_agent = VALUES(user_agent)"
+    );
+    if ($stmt_visit) {
+        mysqli_stmt_bind_param($stmt_visit, "sss", $tgl_hari_ini, $ip_pengunjung, $ua_pengunjung);
+        @mysqli_stmt_execute($stmt_visit);
+        mysqli_stmt_close($stmt_visit);
+    }
+}
+
 $kontak = ambil_pengaturan($conn);
 $telepon_link = preg_replace('/[^0-9+]/', '', $kontak['telepon'] ?? '');
+
+$maps_url = url_aman($kontak['link_maps'] ?? '');
+if ($maps_url === '' && !empty($kontak['alamat'])) {
+    $maps_url = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($kontak['alamat']);
+}
 
 $sosmed = [
     [
@@ -10,8 +35,8 @@ $sosmed = [
         'svg'  => '<svg class="icon-svg" style="width:16px;height:16px;" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>'
     ],
     [
-        'col'  => 'link_twitter',
-        'name' => 'Twitter / X',
+        'col'  => 'link_lms',
+        'name' => 'LMS Sekolah',
         'svg'  => '<svg class="icon-svg" style="width:16px;height:16px;" viewBox="0 0 24 24"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>'
     ],
     [
@@ -59,7 +84,7 @@ $sosmed = [
             <?php if (!empty($kontak['alamat'])) : ?>
             <div class="footer-contact-item">
                 <svg class="icon-svg" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                <a href="https://www.google.com/maps/search/?api=1&amp;query=<?= urlencode($kontak['alamat']) ?>" target="_blank" rel="noopener"><?= e($kontak['alamat']) ?></a>
+                <a href="<?= e($maps_url) ?>" target="_blank" rel="noopener"><?= e($kontak['alamat']) ?></a>
             </div>
             <?php endif; ?>
 

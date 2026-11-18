@@ -456,16 +456,8 @@ nav#menu a.active {
 .teachers-slider-track {
   display: flex;
   gap: 20px;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   padding: 4px 2px 14px;
-}
-
-.teachers-slider-track::-webkit-scrollbar {
-  display: none;
 }
 
 /* Two-Tone Split Teacher Card */

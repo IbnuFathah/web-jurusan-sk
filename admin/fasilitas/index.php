@@ -51,7 +51,7 @@ include __DIR__ . '/../sidebar.php';
             <img src="../../assets/img/fasilitas/<?= htmlspecialchars($row['gambar']); ?>" alt="<?= htmlspecialchars($row['nama_fasilitas']); ?>">
             <div class="card-body">
                 <h3><?= htmlspecialchars($row['nama_fasilitas']); ?></h3>
-                <p>Jumlah: <?= htmlspecialchars($row['jumlah']); ?> unit</p>
+                <p>Jumlah: <?= htmlspecialchars($row['jumlah'] . ' ' . $row['satuan']); ?></p>
             </div>
             <div class="card-footer">
                 <a href="hapus.php?id=<?= (int) $row['id']; ?>" class="btn btn-danger" onclick="return confirm('Yakin ingin menghapus fasilitas ini?')">Hapus</a>

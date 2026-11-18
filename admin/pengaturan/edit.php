@@ -24,14 +24,14 @@ $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sejarah_singkat = trim($_POST['sejarah_singkat'] ?? '');
     $alamat          = trim($_POST['alamat'] ?? '');
+    $link_maps       = trim($_POST['link_maps'] ?? '');
     $email_sekolah   = trim($_POST['email_sekolah'] ?? '');
     $telepon         = trim($_POST['telepon'] ?? '');
     $link_facebook   = trim($_POST['link_facebook'] ?? '');
     $link_instagram  = trim($_POST['link_instagram'] ?? '');
-    $link_twitter    = trim($_POST['link_twitter'] ?? '');
+    $link_lms        = trim($_POST['link_lms'] ?? '');
     $link_linkedin   = trim($_POST['link_linkedin'] ?? '');
 
-    // Fungsi bantu merapikan link sosmed
     $rapikan_url = function($url) {
         if ($url === '') return null;
         if (!preg_match('#^https?://#i', $url)) {
@@ -40,9 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         return $url;
     };
 
+    $link_maps      = $rapikan_url($link_maps);
     $link_facebook  = $rapikan_url($link_facebook);
     $link_instagram = $rapikan_url($link_instagram);
-    $link_twitter   = $rapikan_url($link_twitter);
+    $link_lms       = $rapikan_url($link_lms);
     $link_linkedin  = $rapikan_url($link_linkedin);
 
     if ($sejarah_singkat === '') {
@@ -54,9 +55,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($telepon === '') {
         $error = 'Nomor telepon wajib diisi!';
     } else {
-        $stmt = mysqli_prepare($conn, "UPDATE pengaturan_web SET sejarah_singkat=?, alamat=?, email_sekolah=?, telepon=?, link_facebook=?, link_instagram=?, link_twitter=?, link_linkedin=? WHERE id=?");
+        $stmt = mysqli_prepare($conn, "UPDATE pengaturan_web SET sejarah_singkat=?, alamat=?, link_maps=?, email_sekolah=?, telepon=?, link_facebook=?, link_instagram=?, link_lms=?, link_linkedin=? WHERE id=?");
         if ($stmt) {
-            mysqli_stmt_bind_param($stmt, "ssssssssi", $sejarah_singkat, $alamat, $email_sekolah, $telepon, $link_facebook, $link_instagram, $link_twitter, $link_linkedin, $id);
+            mysqli_stmt_bind_param($stmt, "sssssssssi", $sejarah_singkat, $alamat, $link_maps, $email_sekolah, $telepon, $link_facebook, $link_instagram, $link_lms, $link_linkedin, $id);
             if (mysqli_stmt_execute($stmt)) {
                 echo "<script>alert('Data pengaturan web (Profil & Kontak) berhasil diperbarui!'); window.location='index.php';</script>";
                 exit;
@@ -162,8 +163,13 @@ include __DIR__ . '/../sidebar.php';
 
                 <div class="form-group">
                     <label for="alamat">Alamat Sekolah / Jurusan <span class="req">*</span></label>
-                    <input type="text" id="alamat" name="alamat" class="form-control" value="<?= htmlspecialchars($row['alamat'] ?? '') ?>" placeholder="Contoh: Kawali, Ciamis, Jawa Barat" required>
-                    <div class="form-hint">Akan otomatis diarahkan ke pencarian Google Maps saat diklik pengunjung.</div>
+                    <input type="text" id="alamat" name="alamat" class="form-control" value="<?= htmlspecialchars($row['alamat'] ?? '') ?>" placeholder="Contoh: Jl. Talagasari No. 35, Kawalimukti, Kec. Kawali, Kab. Ciamis, Jawa Barat 46253" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="link_maps">Link URL Google Maps</label>
+                    <input type="text" id="link_maps" name="link_maps" class="form-control" value="<?= htmlspecialchars($row['link_maps'] ?? '') ?>" placeholder="https://maps.app.goo.gl/...">
+                    <div class="form-hint">Opsional: Tempel tautan titik lokasi Google Maps sekolah. Jika dikosongkan, sistem otomatis mengarahkan ke pencarian Google Maps berdasarkan teks alamat.</div>
                 </div>
 
                 <div class="grid-2">
@@ -202,8 +208,8 @@ include __DIR__ . '/../sidebar.php';
 
                 <div class="grid-2">
                     <div class="form-group">
-                        <label for="link_twitter">Link Twitter / X</label>
-                        <input type="text" id="link_twitter" name="link_twitter" class="form-control" value="<?= htmlspecialchars($row['link_twitter'] ?? '') ?>" placeholder="https://twitter.com/namaakun">
+                        <label for="link_lms">Link LMS</label>
+                        <input type="text" id="link_lms" name="link_lms" class="form-control" value="<?= htmlspecialchars($row['link_lms'] ?? '') ?>" placeholder="https://lms.com/namaakun">
                     </div>
 
                     <div class="form-group">

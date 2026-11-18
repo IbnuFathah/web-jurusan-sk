@@ -10,7 +10,10 @@ $row = mysqli_fetch_assoc($result);
 
 if (!$row) {
     echo "<script>alert('Data tidak ditemukan!'); window.location='index.php';</script>";
+    exit;
 }
+
+$opsi_satuan = ['Set', 'Unit', 'Buah', 'Pasang', 'Paket'];
 
 if (isset($_POST['submit'])) {
     $nama_fasilitas = mysqli_real_escape_string($conn, $_POST['nama_fasilitas']);
@@ -20,6 +23,8 @@ if (isset($_POST['submit'])) {
         exit;
     }
     $jumlah = mysqli_real_escape_string($conn, (string) $jumlah);
+    $satuan_raw = trim($_POST['satuan'] ?? 'Set');
+    $satuan = in_array($satuan_raw, $opsi_satuan) ? mysqli_real_escape_string($conn, $satuan_raw) : 'Set';
     $gambar_lama = basename($_POST['gambar_lama']);
 
     if ($_FILES['gambar']['error'] === 4) {
@@ -44,7 +49,7 @@ if (isset($_POST['submit'])) {
         }
     }
 
-    $query_update = "UPDATE fasilitas SET nama_fasilitas = '$nama_fasilitas', jumlah = '$jumlah', gambar = '$nama_file_baru' WHERE id = $id";
+    $query_update = "UPDATE fasilitas SET nama_fasilitas = '$nama_fasilitas', jumlah = '$jumlah', satuan = '$satuan', gambar = '$nama_file_baru' WHERE id = $id";
     if (mysqli_query($conn, $query_update)) {
         echo "<script>alert('Data fasilitas berhasil diubah!'); window.location='index.php';</script>";
     } else {
@@ -66,7 +71,10 @@ if (isset($_POST['submit'])) {
         h2 { margin: 0 0 20px; font-size: 20px; color: #333; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 14px; }
-        input[type="text"], input[type="number"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; font-family: inherit; }
+        input[type="text"], input[type="number"], input[type="file"], select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; font-family: inherit; background: #fff; }
+        .input-group-jumlah { display: flex; gap: 10px; }
+        .input-group-jumlah input[type="number"] { flex: 2; }
+        .input-group-jumlah select { flex: 1; }
         .btn-submit { background: #EEB006; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: 500; }
         .btn-submit:hover { background: #D9A000; }
         .btn-kembali { background: #6c757d; text-decoration: none; color: white; padding: 9px 20px; border-radius: 5px; display: inline-block; font-size: 14px; margin-left: 10px; }
@@ -84,8 +92,16 @@ if (isset($_POST['submit'])) {
             <input type="text" id="nama_fasilitas" name="nama_fasilitas" value="<?= htmlspecialchars($row['nama_fasilitas']); ?>" required>
         </div>
         <div class="form-group">
-            <label for="jumlah">Jumlah (Unit)</label>
-            <input type="number" id="jumlah" name="jumlah" min="0" step="1" value="<?= htmlspecialchars($jumlah_angka[0] ?? '0'); ?>" required>
+            <label for="jumlah">Jumlah &amp; Satuan</label>
+            <div class="input-group-jumlah">
+                <input type="number" id="jumlah" name="jumlah" min="0" step="1" value="<?= htmlspecialchars($jumlah_angka[0] ?? '0'); ?>" required>
+                <select name="satuan" id="satuan" aria-label="Satuan Fasilitas">
+                    <?php $satuan_aktif = $row['satuan'] ?? 'Set'; ?>
+                    <?php foreach ($opsi_satuan as $opt) : ?>
+                        <option value="<?= $opt ?>" <?= $satuan_aktif === $opt ? 'selected' : '' ?>><?= $opt ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
         </div>
         <div class="form-group">
             <label for="gambar">Gambar Fasilitas</label>

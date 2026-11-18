@@ -3,16 +3,19 @@ require_once __DIR__ . '/../../auth.php';
 wajib_admin('../../');
 require_once __DIR__ . '/../../koneksi.php';
 
+$opsi_satuan = ['Set', 'Unit', 'Buah', 'Pasang', 'Paket'];
+
 if (isset($_POST['submit'])) {
     $nama_fasilitas = mysqli_real_escape_string($conn, $_POST['nama_fasilitas']);
     $jumlah = filter_var($_POST['jumlah'] ?? '', FILTER_VALIDATE_INT);
+    $satuan_raw = trim($_POST['satuan'] ?? 'Set');
+    $satuan = in_array($satuan_raw, $opsi_satuan) ? mysqli_real_escape_string($conn, $satuan_raw) : 'Set';
 
     if ($jumlah === false || $jumlah < 0) {
         echo "<script>alert('Jumlah harus berupa angka bulat minimal 0.');</script>";
     } else {
         $jumlah = mysqli_real_escape_string($conn, (string) $jumlah);
 
-        // Proses upload gambar
         $nama_file = $_FILES['gambar']['name'];
         $error = $_FILES['gambar']['error'];
         $tmp_file = $_FILES['gambar']['tmp_name'];
@@ -30,7 +33,7 @@ if (isset($_POST['submit'])) {
                 $nama_file_baru = uniqid() . '.' . $ekstensi_gambar;
                 move_uploaded_file($tmp_file, '../../assets/img/fasilitas/' . $nama_file_baru);
 
-                $query = "INSERT INTO fasilitas (nama_fasilitas, jumlah, gambar) VALUES ('$nama_fasilitas', '$jumlah', '$nama_file_baru')";
+                $query = "INSERT INTO fasilitas (nama_fasilitas, jumlah, satuan, gambar) VALUES ('$nama_fasilitas', '$jumlah', '$satuan', '$nama_file_baru')";
                 if (mysqli_query($conn, $query)) {
                     echo "<script>alert('Data fasilitas berhasil ditambahkan!'); window.location='index.php';</script>";
                 } else {
@@ -55,7 +58,10 @@ if (isset($_POST['submit'])) {
         h2 { margin: 0 0 20px; font-size: 20px; color: #333; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 14px; }
-        input[type="text"], input[type="number"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; font-family: inherit; }
+        input[type="text"], input[type="number"], input[type="file"], select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; font-family: inherit; background: #fff; }
+        .input-group-jumlah { display: flex; gap: 10px; }
+        .input-group-jumlah input[type="number"] { flex: 2; }
+        .input-group-jumlah select { flex: 1; }
         .btn-submit { background: #EEB006; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: 500; }
         .btn-submit:hover { background: #D9A000; }
         .btn-kembali { background: #6c757d; text-decoration: none; color: white; padding: 9px 20px; border-radius: 5px; display: inline-block; font-size: 14px; margin-left: 10px; }
@@ -70,8 +76,15 @@ if (isset($_POST['submit'])) {
             <input type="text" id="nama_fasilitas" name="nama_fasilitas" required>
         </div>
         <div class="form-group">
-            <label for="jumlah">Jumlah (Unit)</label>
-            <input type="number" id="jumlah" name="jumlah" min="0" step="1" value="0" required>
+            <label for="jumlah">Jumlah &amp; Satuan</label>
+            <div class="input-group-jumlah">
+                <input type="number" id="jumlah" name="jumlah" min="0" step="1" value="0" required>
+                <select name="satuan" id="satuan" aria-label="Satuan Fasilitas">
+                    <?php foreach ($opsi_satuan as $opt) : ?>
+                        <option value="<?= $opt ?>"><?= $opt ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
         </div>
         <div class="form-group">
             <label for="gambar">Gambar Fasilitas</label>

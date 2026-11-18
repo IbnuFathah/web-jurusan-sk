@@ -103,6 +103,8 @@
   document.addEventListener('click', function (e) {
     const link = e.target.closest('a[href]');
     if (!link) return;
+    // Jangan intersep tombol konfirmasi itu sendiri
+    if (link.id === 'adminLogoutConfirmBtn') return;
     const href = link.getAttribute('href') || '';
     if (href.includes('logout.php') || href.endsWith('/logout')) {
       e.preventDefault();

@@ -9,7 +9,7 @@ $pesan   = $_SESSION['pesan']   ?? '';
 $berhasil = $_SESSION['berhasil'] ?? false;
 unset($_SESSION['pesan'], $_SESSION['berhasil']);
 
-$guru_list = mysqli_query($conn, "SELECT * FROM guru ORDER BY id ASC");
+$guru_list = mysqli_query($conn, "SELECT g.*, COALESCE(j.nama_jabatan, '-') AS jabatan FROM guru g LEFT JOIN jabatan j ON g.jabatan_id = j.id ORDER BY g.id ASC");
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -317,7 +317,7 @@ include __DIR__ . '/../sidebar.php';
                     <tr>
                         <th style="width:50px">#</th>
                         <th>Nama Guru</th>
-                        <th>Jabatan / Peran</th>
+                        <th>Jabatan</th>
                         <th>Ditambahkan</th>
                         <th style="width:160px; text-align:center">Aksi</th>
                     </tr>

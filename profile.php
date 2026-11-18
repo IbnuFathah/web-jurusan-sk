@@ -3,21 +3,19 @@ require_once __DIR__ . '/helpers.php';
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/koneksi.php';
 
-$fasilitas = mysqli_query($conn, "SELECT nama_fasilitas, jumlah, gambar FROM fasilitas ORDER BY id ASC");
+$fasilitas = mysqli_query($conn, "SELECT nama_fasilitas, jumlah, satuan, gambar FROM fasilitas ORDER BY id ASC");
 if (!$fasilitas) {
     die('Gagal memuat data fasilitas: ' . mysqli_error($conn));
 }
 
-// Sejarah singkat (tabel pengaturan_web) & daftar guru (tabel guru)
 $pengaturan = ambil_pengaturan($conn);
-$guru_query = mysqli_query($conn, "SELECT id, nama_guru, jabatan, gambar FROM guru ORDER BY id ASC");
+$guru_query = mysqli_query($conn, "SELECT g.id, g.nama_guru, COALESCE(j.nama_jabatan, '-') AS jabatan, g.gambar FROM guru g LEFT JOIN jabatan j ON g.jabatan_id = j.id ORDER BY g.id ASC");
 $semua_guru = [];
 if ($guru_query) {
     while ($g = mysqli_fetch_assoc($guru_query)) {
         $semua_guru[] = $g;
     }
 }
-$guru_preview = array_slice($semua_guru, 0, 4);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -30,7 +28,6 @@ $guru_preview = array_slice($semua_guru, 0, 4);
 </head>
 <body>
 
-<!-- Header / Navigation -->
 <header class="navbar">
     <a href="index.php" class="brand">
         <img src="assets/img/logo.png" alt="Logo SMKN 1 Kawali">
@@ -53,7 +50,6 @@ $guru_preview = array_slice($semua_guru, 0, 4);
     </nav>
 </header>
 
-<!-- Main Page Header Banner -->
 <header class="page-header-editorial">
     <div class="container">
         <span class="badge-editorial badge-teal">Profil Program Keahlian</span>
@@ -64,7 +60,7 @@ $guru_preview = array_slice($semua_guru, 0, 4);
 
 <main class="container" style="padding-bottom: 80px; padding-top: 48px; display: flex; flex-direction: column; gap: 48px;">
 
-    <!-- 1. BENTO CARD: SEJARAH SINGKAT (FIRST LOOK) -->
+    <!-- 1. BENTO CARD: SEJARAH SINGKAT -->
     <section class="bento-card">
         <div class="profile-bento-grid">
             <div class="profile-bento-img">
@@ -86,7 +82,7 @@ $guru_preview = array_slice($semua_guru, 0, 4);
         </div>
     </section>
 
-    <!-- 2. BENTO CARD: DAFTAR GURU PENGAJAR (PREVIEW SLIDER & MODAL FLOW) -->
+    <!-- 2. BENTO CARD: DAFTAR GURU PENGAJAR -->
     <section class="bento-card teachers-section-card" id="daftar-guru">
         <div class="teachers-header-row">
             <div>
@@ -104,20 +100,16 @@ $guru_preview = array_slice($semua_guru, 0, 4);
             </div>
         </div>
 
-        <!-- 4-Card Horizontal Carousel / Slider -->
         <div class="teachers-slider-container">
             <div class="teachers-slider-track" id="teacherSliderTrack">
-                <?php foreach ($guru_preview as $idx => $g) : ?>
+                <?php foreach ($semua_guru as $idx => $g) : ?>
                     <?php 
                         $is_alt = ($idx % 2 === 1);
                         $avatar_path = !empty($g['gambar']) ? 'assets/img/guru/' . $g['gambar'] : '';
                         $has_photo = ($avatar_path !== '' && file_exists(__DIR__ . '/' . $avatar_path));
                     ?>
                     <article class="teacher-card<?= $is_alt ? ' teacher-card--alt' : '' ?>" data-teacher-id="<?= (int) $g['id'] ?>">
-                        <!-- Top Header Block (Two-Tone Split) -->
                         <div class="teacher-card-header"></div>
-                        
-                        <!-- Circular Avatar Framed by Crisp White Ring -->
                         <div class="teacher-card-avatar-wrap">
                             <div class="teacher-card-avatar">
                                 <?php if ($has_photo) : ?>
@@ -129,8 +121,6 @@ $guru_preview = array_slice($semua_guru, 0, 4);
                                 <?php endif; ?>
                             </div>
                         </div>
-
-                        <!-- Card Body -->
                         <div class="teacher-card-body">
                             <h4 class="teacher-card-name"><?= e($g['nama_guru']) ?></h4>
                             <p class="teacher-card-role"><?= e($g['jabatan']) ?></p>
@@ -142,20 +132,18 @@ $guru_preview = array_slice($semua_guru, 0, 4);
                     </article>
                 <?php endforeach; ?>
 
-                <?php if (empty($guru_preview)) : ?>
+                <?php if (empty($semua_guru)) : ?>
                     <p style="padding: 40px; color: var(--text-muted); text-align: center; width: 100%;">Belum ada data guru pengajar yang terdaftar.</p>
                 <?php endif; ?>
             </div>
         </div>
 
-        <!-- Pagination Dots -->
         <div class="teachers-slider-dots" id="teacherSliderDots">
-            <?php foreach ($guru_preview as $idx => $g) : ?>
+            <?php foreach ($semua_guru as $idx => $g) : ?>
                 <button type="button" class="slider-dot<?= $idx === 0 ? ' active' : '' ?>" data-index="<?= $idx ?>" aria-label="Slide <?= $idx + 1 ?>"></button>
             <?php endforeach; ?>
         </div>
 
-        <!-- "Lihat Daftar Guru Selengkapnya" Flow (Gold Primary CTA) -->
         <div class="teachers-cta-wrap">
             <button type="button" class="btn btn-gold" id="btnOpenTeacherDirectory">
                 <span>Lihat Daftar Guru Selengkapnya</span>
@@ -185,7 +173,7 @@ $guru_preview = array_slice($semua_guru, 0, 4);
                         <strong><?= e($f['nama_fasilitas']) ?></strong>
                         <span>Sarana Praktik Seni</span>
                     </div>
-                    <span class="fasilitas-unit-pill"><?= e(format_jumlah_fasilitas($f['jumlah'])) ?></span>
+                    <span class="fasilitas-unit-pill"><?= e(format_jumlah_fasilitas($f['jumlah'], $f['satuan'] ?? 'Unit')) ?></span>
                 </div>
             <?php endwhile; ?>
             <?php if (mysqli_num_rows($fasilitas) === 0) : ?>
@@ -196,12 +184,9 @@ $guru_preview = array_slice($semua_guru, 0, 4);
 
 </main>
 
-<!-- ===================================================
-     FULL TEACHER DIRECTORY MODAL (ALL TEACHERS DIRECTORY)
-=================================================== -->
+<!-- FULL TEACHER DIRECTORY MODAL -->
 <div class="directory-modal-overlay" id="teacherDirectoryModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="directoryModalTitle">
     <div class="directory-modal-card">
-        <!-- Modal Header -->
         <div class="directory-modal-header">
             <div class="directory-modal-title">
                 <span class="badge-editorial badge-teal" style="margin-bottom: 6px;">Direktori Lengkap</span>
@@ -214,7 +199,6 @@ $guru_preview = array_slice($semua_guru, 0, 4);
             </button>
         </div>
 
-        <!-- Filter & Search Toolbar -->
         <div class="directory-toolbar">
             <div class="directory-search-box">
                 <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -228,7 +212,6 @@ $guru_preview = array_slice($semua_guru, 0, 4);
             </div>
         </div>
 
-        <!-- Directory Cards Grid -->
         <div class="directory-modal-body">
             <div class="directory-grid" id="teacherDirectoryGrid">
                 <?php foreach ($semua_guru as $idx => $g) : ?>
@@ -271,9 +254,7 @@ $guru_preview = array_slice($semua_guru, 0, 4);
     </div>
 </div>
 
-<!-- ===================================================
-     TEACHER DETAIL MODAL (SINGLE TEACHER PROFILE)
-=================================================== -->
+<!-- TEACHER DETAIL MODAL -->
 <div class="directory-modal-overlay" id="teacherDetailModal" aria-hidden="true" role="dialog" aria-modal="true">
     <div class="teacher-detail-card">
         <div class="teacher-detail-header"></div>

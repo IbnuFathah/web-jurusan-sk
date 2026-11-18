@@ -1,6 +1,7 @@
 <?php
 // koneksi.php — SATU-SATUNYA file koneksi database untuk seluruh website.
 // Semua halaman (publik & admin) cukup memanggil file ini.
+date_default_timezone_set('Asia/Jakarta');
 $host = "localhost";
 $user = "root";
 $pass = "";

@@ -7,6 +7,11 @@ require_once __DIR__ . '/../../helpers.php';
 // Ambil data pengaturan web
 $query = mysqli_query($conn, "SELECT * FROM pengaturan_web ORDER BY id ASC LIMIT 1");
 $data = mysqli_fetch_assoc($query);
+
+$maps_preview = url_aman($data['link_maps'] ?? '');
+if ($maps_preview === '' && !empty($data['alamat'])) {
+    $maps_preview = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($data['alamat']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -67,9 +72,6 @@ $data = mysqli_fetch_assoc($query);
         .empty-state { background: #fff; border-radius: 12px; padding: 50px 30px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
         .empty-state h3 { font-size: 18px; margin-bottom: 8px; color: #333; }
         .empty-state p { color: #777; font-size: 14px; margin-bottom: 20px; }
-
-        .preview-box { margin-top: 15px; border: 2px dashed #ddd; border-radius: 10px; padding: 20px; background: #fafafa; }
-        .preview-title { font-size: 14px; font-weight: 600; color: #777; margin-bottom: 12px; }
     </style>
 </head>
 <body>
@@ -133,11 +135,23 @@ include __DIR__ . '/../sidebar.php';
                         <div class="info-label">Alamat Sekolah</div>
                         <div class="info-val">
                             <?php if (!empty($data['alamat'])) : ?>
-                                <a href="https://www.google.com/maps/search/?api=1&amp;query=<?= urlencode($data['alamat']) ?>" target="_blank" rel="noopener">
+                                <a href="<?= e($maps_preview) ?>" target="_blank" rel="noopener">
                                     <?= e($data['alamat']) ?>
                                 </a>
                             <?php else : ?>
                                 <span style="color: #999;">Belum diisi</span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Link Google Maps</div>
+                        <div class="info-val">
+                            <?php if (!empty($data['link_maps'])) : ?>
+                                <a href="<?= e(url_aman($data['link_maps'])) ?>" target="_blank" rel="noopener">
+                                    <?= e($data['link_maps']) ?>
+                                </a>
+                            <?php else : ?>
+                                <span style="color: #999; font-size: 13px; font-style: italic;">Otomatis dari pencarian alamat</span>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -205,12 +219,12 @@ include __DIR__ . '/../sidebar.php';
                         </div>
                     </div>
                     <div class="sosmed-card">
-                        <div class="sosmed-icon" style="background: #1da1f2;">t</div>
+                        <div class="sosmed-icon" style="background: #1da1f2;">lms</div>
                         <div class="sosmed-text">
-                            <div class="sosmed-name">Twitter / X</div>
-                            <?php if (!empty($data['link_twitter'])) : ?>
-                                <a class="sosmed-link" href="<?= e(url_aman($data['link_twitter'])) ?>" target="_blank" rel="noopener">
-                                    <?= e($data['link_twitter']) ?>
+                            <div class="sosmed-name">LMS Sekolah</div>
+                            <?php if (!empty($data['link_lms'])) : ?>
+                                <a class="sosmed-link" href="<?= e(url_aman($data['link_lms'])) ?>" target="_blank" rel="noopener">
+                                    <?= e($data['link_lms']) ?>
                                 </a>
                             <?php else : ?>
                                 <span class="sosmed-empty">Belum diatur</span>

@@ -11,13 +11,73 @@ function hitung($conn, $tabel) {
     return (int) ($d['total'] ?? 0);
 }
 
-// Data counts
+// Data counts master
 $count_berita     = hitung($conn, 'berita');
 $count_galeri     = hitung($conn, 'galeri');
 $count_fasilitas  = hitung($conn, 'fasilitas');
 $count_pengaturan = hitung($conn, 'pengaturan_web');
 $count_guru       = hitung($conn, 'guru');
-$total_data       = $count_guru + $count_berita + $count_galeri + $count_fasilitas + $count_pengaturan;
+
+// Statistik Pengunjung 7 Hari Terakhir
+$bulan_singkat = [
+    '01' => 'Jan', '02' => 'Feb', '03' => 'Mar', '04' => 'Apr',
+    '05' => 'Mei', '06' => 'Jun', '07' => 'Jul', '08' => 'Agu',
+    '09' => 'Sep', '10' => 'Okt', '11' => 'Nov', '12' => 'Des'
+];
+
+$visitor_map = [];
+$r_vis = @mysqli_query(
+    $conn,
+    "SELECT tanggal, COUNT(*) AS unik, COALESCE(SUM(hits), 0) AS views
+     FROM statistik_pengunjung
+     WHERE tanggal >= DATE_SUB('" . date('Y-m-d') . "', INTERVAL 6 DAY)
+     GROUP BY tanggal"
+);
+if ($r_vis) {
+    while ($v = mysqli_fetch_assoc($r_vis)) {
+        $visitor_map[$v['tanggal']] = [
+            'unik'  => (int) $v['unik'],
+            'views' => (int) $v['views'],
+        ];
+    }
+}
+
+$chart_7_hari = [];
+$total_7_hari_unik = 0;
+$max_visitor = 5;
+
+for ($i = 6; $i >= 0; $i--) {
+    $ts = strtotime("-$i days");
+    $tgl_key = date('Y-m-d', $ts);
+    $unik = $visitor_map[$tgl_key]['unik'] ?? 0;
+    $views = $visitor_map[$tgl_key]['views'] ?? 0;
+
+    $total_7_hari_unik += $unik;
+    if ($unik > $max_visitor) {
+        $max_visitor = $unik;
+    }
+
+    $label_tgl = ($i === 0)
+        ? 'Hari Ini'
+        : date('d', $ts) . ' ' . ($bulan_singkat[date('m', $ts)] ?? date('M', $ts));
+
+    $chart_7_hari[] = [
+        'tanggal'  => tanggal_indo($tgl_key),
+        'label'    => $label_tgl,
+        'unik'     => $unik,
+        'views'    => $views,
+        'is_today' => ($i === 0),
+    ];
+}
+
+$today_key = date('Y-m-d');
+$pengunjung_hari_ini = $visitor_map[$today_key]['unik'] ?? 0;
+$views_hari_ini      = $visitor_map[$today_key]['views'] ?? 0;
+
+$r_total_all = @mysqli_query($conn, "SELECT COUNT(*) AS total_unik, COALESCE(SUM(hits), 0) AS total_views FROM statistik_pengunjung");
+$row_total_all = $r_total_all ? mysqli_fetch_assoc($r_total_all) : null;
+$total_semua_unik  = (int) ($row_total_all['total_unik'] ?? 0);
+$total_semua_views = (int) ($row_total_all['total_views'] ?? 0);
 
 // Data aktivitas / pembaruan terbaru
 $r_berita = mysqli_query($conn, "SELECT judul, tanggal_publikasi FROM berita ORDER BY id DESC LIMIT 1");
@@ -68,7 +128,6 @@ $today_formatted = tanggal_indo(date('Y-m-d'));
         }
 
         .main-content { 
-            /* margin-left diatur oleh sidebar.css (260px / 76px collapsed) */
             flex: 1; 
             min-width: 0; 
             padding: 32px 36px 60px;
@@ -77,7 +136,6 @@ $today_formatted = tanggal_indo(date('Y-m-d'));
             gap: 28px;
         }
 
-        /* Line Icon Utility */
         .icon-line {
             width: 18px;
             height: 18px;
@@ -121,22 +179,6 @@ $today_formatted = tanggal_indo(date('Y-m-d'));
         .welcome-left {
             position: relative;
             z-index: 2;
-        }
-
-        .welcome-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(197, 160, 89, 0.16);
-            border: 1px solid rgba(197, 160, 89, 0.35);
-            color: var(--adm-gold-hover);
-            font-size: 11.5px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            padding: 4px 12px;
-            border-radius: 999px;
-            margin-bottom: 12px;
         }
 
         .pulse-dot {
@@ -337,7 +379,7 @@ $today_formatted = tanggal_indo(date('Y-m-d'));
         .chart-legend {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
             font-size: 12.5px;
             color: var(--adm-slate-body);
         }
@@ -354,10 +396,10 @@ $today_formatted = tanggal_indo(date('Y-m-d'));
             border-radius: 3px;
         }
 
-        /* Interactive SVG Bar Chart */
+        /* Interactive Visitor Bar Chart */
         .chart-container {
             position: relative;
-            padding: 10px 0 20px;
+            padding: 18px 0 20px;
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -368,15 +410,15 @@ $today_formatted = tanggal_indo(date('Y-m-d'));
             display: flex;
             align-items: flex-end;
             justify-content: space-around;
-            height: 220px;
-            padding-bottom: 30px;
+            height: 225px;
+            padding: 0 32px 30px 0;
             border-bottom: 1px solid var(--adm-border);
             position: relative;
         }
 
         .chart-grid-lines {
             position: absolute;
-            inset: 0 0 30px 0;
+            inset: 0 32px 30px 0;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -384,72 +426,103 @@ $today_formatted = tanggal_indo(date('Y-m-d'));
         }
 
         .grid-line {
-            border-bottom: 1px dashed rgba(226, 232, 240, 0.7);
+            border-bottom: 1px dashed rgba(226, 232, 240, 0.8);
             width: 100%;
             display: flex;
             justify-content: flex-end;
         }
 
         .grid-line span {
-            font-size: 10px;
+            font-size: 10.5px;
             color: #94A3B8;
-            margin-right: -24px;
+            margin-right: -30px;
             margin-top: -8px;
+            font-weight: 600;
         }
 
         .chart-bar-group {
             display: flex;
             flex-direction: column;
+            justify-content: flex-end;
             align-items: center;
-            width: 60px;
+            height: 100%;
+            width: 54px;
             position: relative;
             z-index: 2;
             cursor: pointer;
         }
 
+        .bar-value-top {
+            font-size: 11.5px;
+            font-weight: 800;
+            color: var(--adm-slate-dark);
+            margin-bottom: 5px;
+        }
+
+        .bar-value-top.is-zero {
+            color: var(--adm-slate-muted);
+            font-weight: 600;
+        }
+
         .bar-tooltip {
             position: absolute;
-            top: -34px;
+            bottom: calc(100% + 26px);
+            left: 50%;
             background: var(--adm-charcoal);
             color: #FFFFFF;
             font-size: 11.5px;
-            font-weight: 700;
-            padding: 4px 8px;
+            font-weight: 600;
+            padding: 6px 10px;
             border-radius: 6px;
             white-space: nowrap;
             opacity: 0;
-            transform: translateY(4px);
+            transform: translateX(-50%) translateY(4px);
             transition: all 0.2s ease;
             pointer-events: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 10;
         }
 
         .chart-bar-group:hover .bar-tooltip {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateX(-50%) translateY(0);
         }
 
         .chart-bar-fill {
-            width: 38px;
+            width: 34px;
             background: linear-gradient(180deg, var(--adm-gold-hover) 0%, var(--adm-gold) 100%);
             border-radius: 6px 6px 0 0;
             transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s;
             position: relative;
         }
 
+        .chart-bar-fill.is-today {
+            background: linear-gradient(180deg, #EAB308 0%, #B48A3E 100%);
+            box-shadow: 0 4px 14px rgba(197, 160, 89, 0.35);
+        }
+
+        .chart-bar-fill.is-empty {
+            background: #E2E8F0;
+        }
+
         .chart-bar-group:hover .chart-bar-fill {
-            transform: scaleY(1.02);
-            filter: brightness(1.1);
+            transform: scaleY(1.03);
+            filter: brightness(1.08);
         }
 
         .chart-bar-label {
             position: absolute;
-            bottom: -28px;
-            font-size: 12px;
+            bottom: -26px;
+            font-size: 11.5px;
             font-weight: 600;
             color: var(--adm-slate-body);
             white-space: nowrap;
             text-align: center;
+        }
+
+        .chart-bar-label.is-today {
+            color: var(--adm-gold);
+            font-weight: 800;
         }
 
         .chart-metrics-row {
@@ -469,17 +542,23 @@ $today_formatted = tanggal_indo(date('Y-m-d'));
 
         .metric-pill small {
             display: block;
-            font-size: 11.5px;
+            font-size: 11px;
             color: var(--adm-slate-muted);
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
 
         .metric-pill strong {
-            font-size: 16px;
+            font-size: 15.5px;
             font-weight: 800;
             color: var(--adm-slate-dark);
+            display: block;
+        }
+
+        .metric-pill span {
+            font-size: 11.5px;
+            color: var(--adm-slate-muted);
         }
 
         /* Right Column Overview Panels */
@@ -578,7 +657,6 @@ $today_formatted = tanggal_indo(date('Y-m-d'));
             color: #FFFFFF;
         }
 
-        /* Responsive Breakpoints */
         @media (max-width: 1200px) {
             .stat-grid-4 {
                 grid-template-columns: repeat(2, 1fr);
@@ -631,10 +709,6 @@ include __DIR__ . '/sidebar.php';
     <!-- 1. Full-Width Welcome Banner Box -->
     <header class="welcome-banner">
         <div class="welcome-left">
-            <!-- <div class="welcome-badge">
-                <span class="pulse-dot"></span>
-                <span>Pusat Kendali Data Jurusan</span>
-            </div> -->
             <h1 class="welcome-title">Selamat Datang, Admin Web SP &amp; SK</h1>
             <p class="welcome-sub">Ringkasan dan pusat kendali data Jurusan Seni Pertunjukan &amp; Seni Karawitan SMKN 1 Kawali.</p>
         </div>
@@ -716,17 +790,17 @@ include __DIR__ . '/sidebar.php';
     <!-- 3. Analytics Chart & Overview Section -->
     <section class="analytics-section">
         
-        <!-- Left Column: Interactive Data Distribution Chart -->
+        <!-- Left Column: Visitor Analytics Chart (7 Hari Terakhir) -->
         <div class="content-card">
             <div class="card-header-bar">
                 <div class="card-title-group">
-                    <h3>Distribusi Konten &amp; Data Master</h3>
-                    <p>Perbandingan volume data aktif yang tersimpan pada basis data jurusan.</p>
+                    <h3>Statistik Pengunjung Harian</h3>
+                    <p>Grafik trafik pengunjung unik pada website publik dalam 7 hari terakhir.</p>
                 </div>
                 <div class="chart-legend">
                     <div class="legend-item">
                         <span class="legend-color" style="background: var(--adm-gold);"></span>
-                        <span>Item Terdaftar</span>
+                        <span>Pengunjung Unik</span>
                     </div>
                 </div>
             </div>
@@ -736,32 +810,24 @@ include __DIR__ . '/sidebar.php';
                 <div class="chart-bars-wrap">
                     <!-- Background Grid Lines -->
                     <div class="chart-grid-lines">
-                        <div class="grid-line"><span>Max</span></div>
-                        <div class="grid-line"><span>75%</span></div>
-                        <div class="grid-line"><span>50%</span></div>
-                        <div class="grid-line"><span>25%</span></div>
+                        <div class="grid-line"><span><?= $max_visitor ?></span></div>
+                        <div class="grid-line"><span><?= (int) round($max_visitor * 0.75) ?></span></div>
+                        <div class="grid-line"><span><?= (int) round($max_visitor * 0.5) ?></span></div>
+                        <div class="grid-line"><span><?= (int) round($max_visitor * 0.25) ?></span></div>
                         <div class="grid-line"><span>0</span></div>
                     </div>
 
-                    <?php
-                    $max_val = max(10, $count_guru, $count_berita, $count_galeri, $count_fasilitas, $count_pengaturan);
-                    $chart_items = [
-                        ['label' => 'Data Guru',   'count' => $count_guru,       'color' => '#C5A059'],
-                        ['label' => 'Berita',      'count' => $count_berita,     'color' => '#C5A059'],
-                        ['label' => 'Galeri',      'count' => $count_galeri,     'color' => '#C5A059'],
-                        ['label' => 'Fasilitas',   'count' => $count_fasilitas,  'color' => '#C5A059'],
-                        ['label' => 'Pengaturan',  'count' => $count_pengaturan, 'color' => '#C5A059'],
-                    ];
-                    ?>
-
-                    <?php foreach ($chart_items as $item) : ?>
+                    <?php foreach ($chart_7_hari as $day) : ?>
                         <?php 
-                            $height_pct = max(12, round(($item['count'] / $max_val) * 100));
+                            $is_zero = ($day['unik'] === 0);
+                            $height_pct = $is_zero ? 5 : max(14, round(($day['unik'] / $max_visitor) * 85));
                         ?>
                         <div class="chart-bar-group">
-                            <div class="bar-tooltip"><?= e($item['label']) ?>: <?= $item['count'] ?> Data</div>
-                            <div class="chart-bar-fill" style="height: <?= $height_pct ?>%;"></div>
-                            <span class="chart-bar-label"><?= e($item['label']) ?></span>
+                            <span class="bar-value-top<?= $is_zero ? ' is-zero' : '' ?>"><?= $day['unik'] ?></span>
+                            <div class="chart-bar-fill<?= $day['is_today'] ? ' is-today' : '' ?><?= $is_zero ? ' is-empty' : '' ?>" style="height: <?= $height_pct ?>%;">
+                                <div class="bar-tooltip"><?= e($day['tanggal']) ?> &bull; <?= $day['unik'] ?> Pengunjung (<?= $day['views'] ?> Views)</div>
+                            </div>
+                            <span class="chart-bar-label<?= $day['is_today'] ? ' is-today' : '' ?>"><?= e($day['label']) ?></span>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -770,19 +836,19 @@ include __DIR__ . '/sidebar.php';
             <!-- Summary Metrics Below Chart -->
             <div class="chart-metrics-row">
                 <div class="metric-pill">
-                    <small>Total Master Data</small>
-                    <strong><?= $total_data ?> Item Aktif</strong>
+                    <small>Pengunjung Hari Ini</small>
+                    <strong><?= $pengunjung_hari_ini ?> Orang</strong>
+                    <span><?= $views_hari_ini ?> halaman dibuka</span>
                 </div>
                 <div class="metric-pill">
-                    <small>Data Guru Terdaftar</small>
-                    <strong><?= $count_guru ?> Tenaga Pendidik</strong>
+                    <small>7 Hari Terakhir</small>
+                    <strong><?= $total_7_hari_unik ?> Pengunjung</strong>
+                    <span>Akumulasi minggu ini</span>
                 </div>
                 <div class="metric-pill">
-                    <small>Koneksi Basis Data</small>
-                    <strong style="color: #10B981; display: flex; align-items: center; gap: 6px;">
-                        <span class="pulse-dot"></span>
-                        <span>Aktif &amp; Terhubung</span>
-                    </strong>
+                    <small>Total Kunjungan</small>
+                    <strong><?= $total_semua_unik ?> Pengunjung</strong>
+                    <span><?= $total_semua_views ?> total tayangan</span>
                 </div>
             </div>
         </div>

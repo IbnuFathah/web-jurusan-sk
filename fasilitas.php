@@ -55,8 +55,8 @@ $fasilitas = mysqli_query($conn, "SELECT * FROM fasilitas ORDER BY id ASC");
             </div>
             <div class="news-content" style="padding: 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <span class="badge-editorial badge-teal" style="margin-bottom: 0; font-size: 11px;">Instrumen Seni</span>
-                    <span class="fasilitas-unit-pill"><?= e(format_jumlah_fasilitas($f['jumlah'])) ?></span>
+                    <!-- <span class="badge-editorial badge-teal" style="margin-bottom: 0; font-size: 11px;">Instrumen Seni</span> -->
+                    <span class="fasilitas-unit-pill"><?= e(format_jumlah_fasilitas($f['jumlah'], $f['satuan'] ?? 'Unit')) ?></span>
                 </div>
                 <h3 style="font-size: 17px; font-weight: 700; color: var(--text-heading); margin-top: 6px;">
                     <?= e($f['nama_fasilitas']) ?>

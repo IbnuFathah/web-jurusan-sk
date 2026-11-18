@@ -15,20 +15,20 @@ if (!$res || mysqli_num_rows($res) === 0) {
     exit;
 }
 $guru = mysqli_fetch_assoc($res);
+$jabatan_list = mysqli_query($conn, "SELECT id, nama_jabatan FROM jabatan ORDER BY id ASC");
 
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nama_guru = trim($_POST['nama_guru'] ?? '');
-    $jabatan   = trim($_POST['jabatan']   ?? '');
-    $gambar_name = $guru['gambar'] ?? ''; // keep old by default
+    $nama_guru   = trim($_POST['nama_guru'] ?? '');
+    $jabatan_id  = (int)($_POST['jabatan_id'] ?? 0);
+    $gambar_name = $guru['gambar'] ?? '';
 
     if (empty($nama_guru)) {
         $error = 'Nama guru tidak boleh kosong.';
-    } elseif (empty($jabatan)) {
-        $error = 'Jabatan tidak boleh kosong.';
+    } elseif ($jabatan_id <= 0) {
+        $error = 'Jabatan wajib dipilih.';
     } else {
-        // Handle new photo upload
         if (!empty($_FILES['gambar']['name'])) {
             $allowed = ['jpg','jpeg','png','webp'];
             $ext = strtolower(pathinfo($_FILES['gambar']['name'], PATHINFO_EXTENSION));
@@ -40,7 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $new_name   = 'guru_' . time() . '_' . rand(100,999) . '.' . $ext;
                 $upload_dir = __DIR__ . '/../../assets/img/guru/';
                 if (move_uploaded_file($_FILES['gambar']['tmp_name'], $upload_dir . $new_name)) {
-                    // Delete old photo
                     if (!empty($guru['gambar']) && file_exists($upload_dir . $guru['gambar'])) {
                         @unlink($upload_dir . $guru['gambar']);
                     }
@@ -51,7 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // Handle "hapus foto" checkbox
         if (empty($error) && isset($_POST['hapus_foto']) && $_POST['hapus_foto'] === '1') {
             $upload_dir = __DIR__ . '/../../assets/img/guru/';
             if (!empty($guru['gambar']) && file_exists($upload_dir . $guru['gambar'])) {
@@ -61,12 +59,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (empty($error)) {
-            $nama_esc    = mysqli_real_escape_string($conn, $nama_guru);
-            $jabatan_esc = mysqli_real_escape_string($conn, $jabatan);
-            $gambar_esc  = mysqli_real_escape_string($conn, $gambar_name);
-            $gambar_val  = $gambar_name ? "'$gambar_esc'" : "NULL";
+            $nama_esc   = mysqli_real_escape_string($conn, $nama_guru);
+            $gambar_esc = mysqli_real_escape_string($conn, $gambar_name);
+            $gambar_val = $gambar_name ? "'$gambar_esc'" : "NULL";
 
-            $sql = "UPDATE guru SET nama_guru='$nama_esc', jabatan='$jabatan_esc', gambar=$gambar_val WHERE id=$id";
+            $sql = "UPDATE guru SET nama_guru='$nama_esc', jabatan_id=$jabatan_id, gambar=$gambar_val WHERE id=$id";
             if (mysqli_query($conn, $sql)) {
                 $_SESSION['pesan']    = "Data guru \"$nama_guru\" berhasil diperbarui.";
                 $_SESSION['berhasil'] = true;
@@ -77,9 +74,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
-    // Re-fetch for display on error
-    $guru['nama_guru'] = $_POST['nama_guru'] ?? $guru['nama_guru'];
-    $guru['jabatan']   = $_POST['jabatan']   ?? $guru['jabatan'];
+    $guru['nama_guru']  = $_POST['nama_guru'] ?? $guru['nama_guru'];
+    $guru['jabatan_id'] = $_POST['jabatan_id'] ?? $guru['jabatan_id'];
 }
 ?>
 <!DOCTYPE html>
@@ -95,10 +91,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             --adm-bg: #F8F9FA; --adm-card: #FFFFFF;
             --adm-gold: #C5A059; --adm-gold-hover: #D4AF37;
             --adm-gold-tint: rgba(197,160,89,0.12);
-            --adm-charcoal: #18181B;
-            --adm-slate-dark: #1E293B; --adm-slate-body: #475569;
-            --adm-slate-muted: #94A3B8; --adm-border: #E2E8F0;
-            --adm-shadow: 0 8px 24px -8px rgba(0,0,0,0.05);
+            --adm-charcoal: #18181B; --adm-slate-dark: #1E293B;
+            --adm-slate-body: #475569; --adm-slate-muted: #94A3B8;
+            --adm-border: #E2E8F0; --adm-shadow: 0 8px 24px -8px rgba(0,0,0,0.05);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--adm-bg); display: flex; font-family: 'Plus Jakarta Sans', sans-serif; color: var(--adm-slate-body); min-height: 100vh; }
@@ -117,15 +112,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .form-control { width: 100%; padding: 11px 16px; border: 1.5px solid var(--adm-border); border-radius: 10px; font-size: 14px; font-family: inherit; color: var(--adm-slate-dark); background: #fff; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
         .form-control:focus { border-color: var(--adm-gold); box-shadow: 0 0 0 3px rgba(197,160,89,0.15); }
         .form-hint { font-size: 12px; color: var(--adm-slate-muted); margin-top: 6px; }
-
-        /* Current photo display */
+        .form-hint a { color: var(--adm-gold); font-weight: 600; text-decoration: none; }
         .current-photo-wrap { display: flex; align-items: center; gap: 16px; padding: 16px; background: #F8FAFC; border: 1px solid var(--adm-border); border-radius: 12px; margin-bottom: 16px; }
         .current-photo-wrap img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--adm-border); }
         .avatar-initials { width: 60px; height: 60px; border-radius: 50%; background: var(--adm-gold-tint); border: 2px solid rgba(197,160,89,0.3); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: var(--adm-gold); flex-shrink: 0; }
-        .current-photo-info small { font-size: 12px; color: var(--adm-slate-muted); display: block; }
         .check-hapus { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 13px; color: #ef4444; cursor: pointer; }
         .check-hapus input { accent-color: #ef4444; }
-
         .upload-area { border: 2px dashed var(--adm-border); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; position: relative; }
         .upload-area:hover { border-color: var(--adm-gold); background: var(--adm-gold-tint); }
         .upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
@@ -133,7 +125,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .upload-icon svg { width: 30px; height: 30px; stroke: var(--adm-slate-muted); fill: none; stroke-width: 1.5; }
         .upload-text { font-size: 12px; color: var(--adm-slate-muted); margin-top: 6px; }
         .upload-text strong { color: var(--adm-gold); }
-
         .form-actions { display: flex; gap: 12px; margin-top: 32px; }
         .btn-submit { display: inline-flex; align-items: center; gap: 8px; background: var(--adm-gold); color: var(--adm-charcoal); padding: 12px 28px; border-radius: 10px; font-size: 14px; font-weight: 700; border: none; cursor: pointer; transition: all 0.2s; }
         .btn-submit:hover { background: var(--adm-gold-hover); box-shadow: 0 4px 14px rgba(197,160,89,0.35); transform: translateY(-1px); }
@@ -151,7 +142,6 @@ include __DIR__ . '/../sidebar.php';
 ?>
 
 <main class="main-content">
-
     <div>
         <a href="index.php" class="btn-back">
             <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
@@ -167,8 +157,6 @@ include __DIR__ . '/../sidebar.php';
         <?php endif; ?>
 
         <form method="POST" enctype="multipart/form-data">
-
-            <!-- Foto saat ini -->
             <div class="form-group">
                 <label>Foto Profil</label>
                 <div class="current-photo-wrap">
@@ -204,10 +192,16 @@ include __DIR__ . '/../sidebar.php';
             </div>
 
             <div class="form-group">
-                <label for="jabatan">Jabatan / Peran <span>*</span></label>
-                <input type="text" id="jabatan" name="jabatan" class="form-control"
-                    value="<?= htmlspecialchars($guru['jabatan']) ?>" required>
-                <div class="form-hint">Contoh: Ketua Program Keahlian, Wali Kelas, Guru Pengajar</div>
+                <label for="jabatan_id">Jabatan<span>*</span></label>
+                <select id="jabatan_id" name="jabatan_id" class="form-control" required>
+                    <option value="" disabled <?= empty($guru['jabatan_id']) ? 'selected' : '' ?>>-- Pilih Jabatan --</option>
+                    <?php if ($jabatan_list): while ($j = mysqli_fetch_assoc($jabatan_list)): ?>
+                        <option value="<?= (int)$j['id'] ?>" <?= ((int)$guru['jabatan_id'] === (int)$j['id']) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($j['nama_jabatan']) ?>
+                        </option>
+                    <?php endwhile; endif; ?>
+                </select>
+                <div class="form-hint">Pilihan jabatan belum ada? <a href="../jabatan/tambah.php">+ Tambah Jabatan Baru</a></div>
             </div>
 
             <div class="form-actions">
@@ -217,10 +211,8 @@ include __DIR__ . '/../sidebar.php';
                 </button>
                 <a href="index.php" class="btn-cancel-link">Batal</a>
             </div>
-
         </form>
     </div>
-
 </main>
 
 <script>
@@ -238,6 +230,5 @@ function previewFoto(input) {
     }
 }
 </script>
-
 </body>
 </html>
